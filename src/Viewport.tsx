@@ -27,6 +27,13 @@ const PixiComponentViewport = PixiComponent('Viewport', {
 
     return viewport;
   },
+  applyProps: (instance, _, props) => {
+    const { width, height } = props;
+    instance.screenWidth = width;
+    instance.screenHeight = height;
+    instance.worldWidth = width * 2;
+    instance.worldHeight = height * 2;
+  },
 });
 
 export const Viewport = (props: ViewportProps) => {

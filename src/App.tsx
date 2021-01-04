@@ -13,9 +13,9 @@ function App() {
     if (stageRef && stageRef.current) {
       setStageWidth(stageRef.current.offsetWidth);
       setStageHeight(stageRef.current.offsetHeight);
-      // console.log(
-      //   `${stageRef.current.offsetWidth} * ${stageRef.current.offsetHeight}`
-      // );
+      console.log(
+        `${stageRef.current.offsetWidth} * ${stageRef.current.offsetHeight}`
+      );
     }
   }, [stageRef]);
   return (
@@ -24,7 +24,7 @@ function App() {
       <main className="App-main">
         <div className="Stage" ref={stageRef}>
           <Stage width={stageWidth} height={stageHeight}>
-            <Viewport width={200} height={100}>
+            <Viewport width={stageWidth} height={stageHeight}>
               <Sprite image={imagePath} x={0} y={0} />
             </Viewport>
           </Stage>
