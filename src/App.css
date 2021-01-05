@@ -1,4 +1,11 @@
 @import '~antd/dist/antd.css';
+/* 
+#456268
+#79A3B1
+#D0E8F2
+#FCF8EC
+*/
+
 .App {
   display: flex;
   flex-direction: column;
@@ -7,24 +14,47 @@
 
 .App-header {
   min-height: 35px;
-  background-color: #282c34;
+  background-color: #456268;
   color: white;
 }
 
 .App-main {
   flex: auto;
   display: flex;
-  flex-direction: 100%;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .App-footer {
   min-height: 60px;
-  background-color: #282c34;
+  background-color: #456268;
 }
 
 .App-link {
   color: #61dafb;
+}
+
+.Tools {
+  background-color: #79a3b1;
+  color: white;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ToolMode {
+  /* background-color: tomato; */
+  display: flex;
+  min-height: 3em;
+  padding-top: 0.5em;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
+}
+
+.ToolDetail {
+  display: flex;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
 }
 
 .Stage {

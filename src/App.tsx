@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
+import { Button } from 'antd';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { Stage, Sprite } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
 import exampleImage from './example_data/simple002.jpeg';
@@ -34,6 +36,21 @@ function App() {
     <div className="App">
       <header className="App-header"></header>
       <main className="App-main">
+        <div className="Tools">
+          <div className="ToolMode">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              style={{ marginRight: '1.5em' }}
+            >
+              New
+            </Button>
+            <Button type="primary" icon={<EditOutlined />}>
+              Edit
+            </Button>
+          </div>
+          <div className="ToolDetail">detailed area</div>
+        </div>
         <div className="Stage" ref={stageRef}>
           <Stage
             width={stageWidth}
@@ -42,6 +59,7 @@ function App() {
             style={{ cursor: panMode ? 'move' : 'default' }}
             onKeyPress={handleKeyPress}
             onKeyUp={handleKeyUp}
+            options={{ backgroundColor: 0xfcf8ec }}
           >
             <Viewport
               width={stageWidth}
