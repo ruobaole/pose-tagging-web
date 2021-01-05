@@ -37,7 +37,7 @@
 .Tools {
   background-color: #79a3b1;
   color: white;
-  min-height: 140px;
+  min-height: 100px;
   display: flex;
   flex-direction: column;
 }
@@ -55,6 +55,8 @@
   display: flex;
   padding-right: 0.5em;
   padding-left: 0.5em;
+  max-height: 150px;
+  overflow: auto;
 }
 
 .Stage {

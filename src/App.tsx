@@ -5,10 +5,13 @@ import { RadioChangeEvent } from 'antd/lib/radio';
 import { Stage, Sprite, Container, useApp } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
 import { Keypoint } from './Keypoint';
+import { InsertKPGTool } from './InsertKPGTool';
 import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
+import labelingConfig from './labeling_config.json';
 
 function App() {
+  const kpLen = labelingConfig.keypointGraph.length;
   const [imagePath, setImagePath] = useState<string>(exampleImage);
   const [stageWidth, setStageWidth] = useState<number>(256);
   const [stageHeight, setStageHeight] = useState<number>(256);
@@ -16,6 +19,7 @@ function App() {
   const [toolMode, setToolMode] = useState<string>('i');
   const [kx, setKx] = useState<number>(80);
   const [ky, setKy] = useState<number>(80);
+  const [curKPIndex, setcurKPIndex] = useState<number>(0);
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
@@ -49,8 +53,10 @@ function App() {
         console.log(`left ${e.world.x}, ${e.world.y}`);
         setKx(e.world.x);
         setKy(e.world.y);
+        setcurKPIndex((curKPIndex + 1) % kpLen);
       } else if (e.event.data.button === 2) {
         // right click
+        setcurKPIndex((curKPIndex - 1 + kpLen) % kpLen);
         console.log(`right ${e.world.x}, ${e.world.y}`);
       }
     }
@@ -64,8 +70,8 @@ function App() {
           <div className="ToolMode">
             <Radio.Group
               options={[
-                { label: 'Add New (i)', value: 'i' },
-                { label: 'Select & Edit (e)', value: 'e' },
+                { label: 'Insert Mode (i)', value: 'i' },
+                { label: 'Edit Mode (e)', value: 'e' },
               ]}
               onChange={handleToolModeChange}
               value={toolMode}
@@ -73,7 +79,9 @@ function App() {
               buttonStyle="solid"
             />
           </div>
-          <div className="ToolDetail">detailed area</div>
+          <div className="ToolDetail">
+            {toolMode === 'i' ? <InsertKPGTool kpIndex={curKPIndex} /> : null}
+          </div>
         </div>
         <div className="Stage" ref={stageRef}>
           <Stage

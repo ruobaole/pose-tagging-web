@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js';
 import { PixiComponent, useApp } from '@inlet/react-pixi';
 import { ClickEventData, Viewport as PixiViewport } from 'pixi-viewport';
 
-export interface ViewportProps {
+export interface IViewportProps {
   width: number;
   height: number;
   enablePan: boolean;
@@ -11,12 +11,12 @@ export interface ViewportProps {
   children?: React.ReactNode;
 }
 
-export interface PixiComponentViewportProps extends ViewportProps {
+export interface IPixiComponentViewportProps extends IViewportProps {
   app: PIXI.Application;
 }
 
 const PixiComponentViewport = PixiComponent('Viewport', {
-  create: (props: PixiComponentViewportProps) => {
+  create: (props: IPixiComponentViewportProps) => {
     const viewport = new PixiViewport({
       screenWidth: props.width,
       screenHeight: props.height,
@@ -52,7 +52,7 @@ const PixiComponentViewport = PixiComponent('Viewport', {
   },
 });
 
-export const Viewport = (props: ViewportProps) => {
+export const Viewport = (props: IViewportProps) => {
   const app = useApp();
   return <PixiComponentViewport app={app} {...props} />;
 };

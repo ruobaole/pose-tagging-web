@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { Graphics } from '@inlet/react-pixi';
 
-interface IKeypointProp {
+interface IKeypointProps {
   x: number;
   y: number;
   radius: number;
 }
 
-export function Keypoint(props: IKeypointProp) {
+export function Keypoint(props: IKeypointProps) {
   const draw = useCallback(
     (g) => {
       g.clear();
