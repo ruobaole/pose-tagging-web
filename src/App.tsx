@@ -8,6 +8,7 @@ function App() {
   const [imagePath, setImagePath] = useState<string>(exampleImage);
   const [stageWidth, setStageWidth] = useState<number>(256);
   const [stageHeight, setStageHeight] = useState<number>(256);
+  const [panMode, setPanMode] = useState<boolean>(false);
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
@@ -18,12 +19,29 @@ function App() {
       );
     }
   }, [stageRef]);
+  function handleKeyPress(e: React.KeyboardEvent<any>) {
+    if (e.key === ' ' && !e.repeat) {
+      setPanMode(true);
+    }
+  }
+  function handleKeyUp(e: React.KeyboardEvent<any>) {
+    if (e.key === ' ' && !e.repeat) {
+      setPanMode(false);
+    }
+  }
+  console.log(`PAN: ${panMode}`);
   return (
     <div className="App">
       <header className="App-header"></header>
       <main className="App-main">
         <div className="Stage" ref={stageRef}>
-          <Stage width={stageWidth} height={stageHeight}>
+          <Stage
+            width={stageWidth}
+            height={stageHeight}
+            tabIndex={0}
+            onKeyPress={handleKeyPress}
+            onKeyUp={handleKeyUp}
+          >
             <Viewport width={stageWidth} height={stageHeight}>
               <Sprite image={imagePath} x={0} y={0} />
             </Viewport>
