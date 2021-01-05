@@ -1,16 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
-import { Button } from 'antd';
+import { Radio } from 'antd';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { Stage, Sprite } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
 import exampleImage from './example_data/simple002.jpeg';
+import { RadioChangeEvent } from 'antd/lib/radio';
 
 function App() {
   const [imagePath, setImagePath] = useState<string>(exampleImage);
   const [stageWidth, setStageWidth] = useState<number>(256);
   const [stageHeight, setStageHeight] = useState<number>(256);
   const [panMode, setPanMode] = useState<boolean>(false);
+  const [toolMode, setToolMode] = useState<string>('i');
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
@@ -31,6 +33,9 @@ function App() {
       setPanMode(false);
     }
   }
+  function handleToolModeChange(e: RadioChangeEvent) {
+    setToolMode(e.target.value);
+  }
   console.log(`PAN: ${panMode}`);
   return (
     <div className="App">
@@ -38,16 +43,16 @@ function App() {
       <main className="App-main">
         <div className="Tools">
           <div className="ToolMode">
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              style={{ marginRight: '1.5em' }}
-            >
-              New
-            </Button>
-            <Button type="primary" icon={<EditOutlined />}>
-              Edit
-            </Button>
+            <Radio.Group
+              options={[
+                { label: 'Add New (i)', value: 'i' },
+                { label: 'Select & Edit (e)', value: 'e' },
+              ]}
+              onChange={handleToolModeChange}
+              value={toolMode}
+              optionType="button"
+              buttonStyle="solid"
+            />
           </div>
           <div className="ToolDetail">detailed area</div>
         </div>
