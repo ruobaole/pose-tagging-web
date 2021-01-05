@@ -1,0 +1,381 @@
+{
+  "keypointGraph": [
+    {
+      "name": "nose",
+      "displayText": "0",
+      "neighbors": [],
+      "edgeColors": [],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_eye",
+      "displayText": "1",
+      "neighbors": [0],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_eye",
+      "displayText": "2",
+      "neighbors": [0],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_ear",
+      "displayText": "3",
+      "neighbors": [0],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_ear",
+      "displayText": "4",
+      "neighbors": [0],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "mouth_right",
+      "displayText": "5",
+      "neighbors": [0],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "mouth_left",
+      "displayText": "6",
+      "neighbors": [0],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_shoulder",
+      "displayText": "7",
+      "neighbors": [],
+      "edgeColors": [],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_shoulder",
+      "displayText": "8",
+      "neighbors": [7],
+      "edgeColors": ["0xff08f7"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_elbow",
+      "displayText": "9",
+      "neighbors": [7],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_elbow",
+      "displayText": "10",
+      "neighbors": [8],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_wrist",
+      "displayText": "11",
+      "neighbors": [9],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_wrist",
+      "displayText": "12",
+      "neighbors": [10],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_pinky",
+      "displayText": "13",
+      "neighbors": [11],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_pinky",
+      "displayText": "14",
+      "neighbors": [12],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_index",
+      "displayText": "15",
+      "neighbors": [11],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_index",
+      "displayText": "16",
+      "neighbors": [12],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_thumb",
+      "displayText": "17",
+      "neighbors": [11],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_thumb",
+      "displayText": "18",
+      "neighbors": [12],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_hip",
+      "displayText": "19",
+      "neighbors": [7],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_hip",
+      "displayText": "20",
+      "neighbors": [8, 19],
+      "edgeColors": ["0xff5e08", "0xff08f7"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_knee",
+      "displayText": "21",
+      "neighbors": [19],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_knee",
+      "displayText": "22",
+      "neighbors": [20],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_ankle",
+      "displayText": "23",
+      "neighbors": [21],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_ankle",
+      "displayText": "24",
+      "neighbors": [22],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_heel",
+      "displayText": "25",
+      "neighbors": [23],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_heel",
+      "displayText": "26",
+      "neighbors": [24],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "right_foot_index",
+      "displayText": "27",
+      "neighbors": [23],
+      "edgeColors": ["0x08ffff"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "left_foot_index",
+      "displayText": "28",
+      "neighbors": [24],
+      "edgeColors": ["0xff5e08"],
+      "properties": {
+        "is_visible": {
+          "type": "boolean",
+          "title": "is_visible",
+          "default": "true"
+        }
+      }
+    }
+  ]
+}
