@@ -1,12 +1,13 @@
 import React from 'react';
 import * as PIXI from 'pixi.js';
 import { PixiComponent, useApp } from '@inlet/react-pixi';
-import { Viewport as PixiViewport } from 'pixi-viewport';
+import { ClickEventData, Viewport as PixiViewport } from 'pixi-viewport';
 
 export interface ViewportProps {
   width: number;
   height: number;
   enablePan: boolean;
+  onClicked?: (data: ClickEventData) => void;
   children?: React.ReactNode;
 }
 
@@ -24,12 +25,15 @@ const PixiComponentViewport = PixiComponent('Viewport', {
       ticker: props.app.ticker,
       interaction: props.app.renderer.plugins.interaction,
     });
+    if (props.onClicked) {
+      viewport.on('clicked', props.onClicked);
+    }
     viewport.drag().pinch().wheel().clampZoom();
 
     return viewport;
   },
   applyProps: (instance, _, props) => {
-    const { width, height, enablePan } = props;
+    const { width, height, enablePan, onClicked } = props;
     instance.screenWidth = width;
     instance.screenHeight = height;
     instance.worldWidth = width * 2;
@@ -40,6 +44,10 @@ const PixiComponentViewport = PixiComponent('Viewport', {
     } else {
       instance.plugins.pause('drag');
       instance.plugins.pause('pinch');
+    }
+    instance.removeListener('clicked');
+    if (props.onClicked) {
+      instance.on('clicked', props.onClicked);
     }
   },
 });

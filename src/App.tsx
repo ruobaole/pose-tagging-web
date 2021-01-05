@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 import { Radio } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
-import { Stage, Sprite } from '@inlet/react-pixi';
-import { Viewport } from './Viewport';
-import exampleImage from './example_data/simple002.jpeg';
 import { RadioChangeEvent } from 'antd/lib/radio';
+import { Stage, Sprite, Container, useApp } from '@inlet/react-pixi';
+import { Viewport } from './Viewport';
+import { Keypoint } from './Keypoint';
+import { ClickEventData } from 'pixi-viewport';
+import exampleImage from './example_data/simple002.jpeg';
 
 function App() {
   const [imagePath, setImagePath] = useState<string>(exampleImage);
@@ -13,6 +14,8 @@ function App() {
   const [stageHeight, setStageHeight] = useState<number>(256);
   const [panMode, setPanMode] = useState<boolean>(false);
   const [toolMode, setToolMode] = useState<string>('i');
+  const [kx, setKx] = useState<number>(80);
+  const [ky, setKy] = useState<number>(80);
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
@@ -35,6 +38,22 @@ function App() {
   }
   function handleToolModeChange(e: RadioChangeEvent) {
     setToolMode(e.target.value);
+  }
+  function handleClicked(e: ClickEventData) {
+    if (panMode) {
+      return;
+    }
+    if (toolMode === 'i') {
+      if (e.event.data.button === 0) {
+        // left click
+        console.log(`left ${e.world.x}, ${e.world.y}`);
+        setKx(e.world.x);
+        setKy(e.world.y);
+      } else if (e.event.data.button === 2) {
+        // right click
+        console.log(`right ${e.world.x}, ${e.world.y}`);
+      }
+    }
   }
   console.log(`PAN: ${panMode}`);
   return (
@@ -64,14 +83,19 @@ function App() {
             style={{ cursor: panMode ? 'move' : 'default' }}
             onKeyPress={handleKeyPress}
             onKeyUp={handleKeyUp}
+            onContextMenu={(e) => {
+              e.preventDefault();
+            }}
             options={{ backgroundColor: 0xfcf8ec }}
           >
             <Viewport
               width={stageWidth}
               height={stageHeight}
               enablePan={panMode}
+              onClicked={handleClicked}
             >
               <Sprite image={imagePath} x={0} y={0} />
+              <Keypoint x={kx} y={ky} radius={4} />
             </Viewport>
           </Stage>
         </div>
