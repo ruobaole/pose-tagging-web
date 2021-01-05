@@ -39,10 +39,15 @@ function App() {
             width={stageWidth}
             height={stageHeight}
             tabIndex={0}
+            style={{ cursor: panMode ? 'move' : 'default' }}
             onKeyPress={handleKeyPress}
             onKeyUp={handleKeyUp}
           >
-            <Viewport width={stageWidth} height={stageHeight}>
+            <Viewport
+              width={stageWidth}
+              height={stageHeight}
+              enablePan={panMode}
+            >
               <Sprite image={imagePath} x={0} y={0} />
             </Viewport>
           </Stage>

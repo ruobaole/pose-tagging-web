@@ -6,6 +6,7 @@ import { Viewport as PixiViewport } from 'pixi-viewport';
 export interface ViewportProps {
   width: number;
   height: number;
+  enablePan: boolean;
   children?: React.ReactNode;
 }
 
@@ -28,11 +29,18 @@ const PixiComponentViewport = PixiComponent('Viewport', {
     return viewport;
   },
   applyProps: (instance, _, props) => {
-    const { width, height } = props;
+    const { width, height, enablePan } = props;
     instance.screenWidth = width;
     instance.screenHeight = height;
     instance.worldWidth = width * 2;
     instance.worldHeight = height * 2;
+    if (enablePan) {
+      instance.plugins.resume('drag');
+      instance.plugins.resume('pinch');
+    } else {
+      instance.plugins.pause('drag');
+      instance.plugins.pause('pinch');
+    }
   },
 });
 
