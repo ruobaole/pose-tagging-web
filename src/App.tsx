@@ -4,13 +4,44 @@ import produce from 'immer';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
-import { Stage, Sprite, Container, useApp } from '@inlet/react-pixi';
+import { Stage, Sprite } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
 import { Keypoint } from './Keypoint';
 import { InsertKPGTool } from './InsertKPGTool';
 import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
 import labelingConfig from './labeling_config.json';
+
+const KPGMold = labelingConfig.keypointGraph;
+const kpLen = labelingConfig.keypointGraph.length;
+export interface IProperties {
+  [prop: string]: {
+    type: string;
+    value: string | number | boolean;
+  };
+}
+
+function getKPDefaultProps(idx: number) {
+  const defaultProps: IProperties = {};
+  Object.keys(KPGMold[idx].properties).forEach((propName) => {
+    defaultProps[propName] = {
+      type: (KPGMold[idx].properties as any)[propName].type,
+      value: (KPGMold[idx].properties as any)[propName].default,
+    };
+  });
+  return defaultProps;
+}
+
+function copyProps(props0: IProperties) {
+  const newProps: IProperties = {};
+  Object.keys(props0).forEach((propName) => {
+    newProps[propName] = {
+      type: (props0 as any)[propName].type,
+      value: (props0 as any)[propName].value,
+    };
+  });
+  return newProps;
+}
 
 // store states
 type SetupState = {
@@ -34,38 +65,37 @@ type LabelState = {
     name: string;
     x: number;
     y: number;
-    properties: {
-      [prop: string]: {
-        type: string;
-        value: string | number | boolean;
-      };
-    };
+    properties: IProperties;
   }[][];
   curKPG: number;
   curKP: number;
+  curProps: IProperties;
   set: (fn: (state: LabelState) => void) => void;
 };
-const useLabelStore = create<LabelState>((set) => ({
+export const useLabelStore = create<LabelState>((set) => ({
   keypointGraphList: [[]],
   curKPG: 0,
   curKP: 0,
+  curProps: getKPDefaultProps(0),
   set: (fn) => set(produce(fn)),
 }));
-const labelSelector = (state: LabelState) => ({
+export const labelSelector = (state: LabelState) => ({
   keypointGraphList: state.keypointGraphList,
   curKPG: state.curKPG,
   curKP: state.curKP,
+  curProps: state.curProps,
   setLabelState: state.set,
 });
 
-const KPGMold = labelingConfig.keypointGraph;
-const kpLen = labelingConfig.keypointGraph.length;
-
 function App() {
   const { imagePath, stageSize, setStageSize } = useSetupStore(setupSelector);
-  const { curKPG, curKP, keypointGraphList, setLabelState } = useLabelStore(
-    labelSelector
-  );
+  const {
+    curKPG,
+    curKP,
+    curProps,
+    keypointGraphList,
+    setLabelState,
+  } = useLabelStore(labelSelector);
   const [panMode, setPanMode] = useState<boolean>(false);
   const [toolMode, setToolMode] = useState<string>('i');
   const [kx, setKx] = useState<number>(80);
@@ -78,7 +108,7 @@ function App() {
         `${stageRef.current.offsetWidth} * ${stageRef.current.offsetHeight}`
       );
     }
-  }, [stageRef]);
+  }, [stageRef, setStageSize]);
   function handleKeyPress(e: React.KeyboardEvent<any>) {
     if (e.key === ' ' && !e.repeat) {
       setPanMode(true);
@@ -97,6 +127,7 @@ function App() {
       return;
     }
     if (toolMode === 'i') {
+      let newCurKP: number = curKP;
       if (e.event.data.button === 0) {
         // left click
         console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
@@ -107,12 +138,7 @@ function App() {
           name: KPGMold[curKP].name,
           x: e.world.x,
           y: e.world.y,
-          properties: {
-            is_visible: {
-              type: 'boolean',
-              value: true,
-            },
-          },
+          properties: curProps,
         };
         if (
           curKP === kpLen - 1 &&
@@ -125,29 +151,42 @@ function App() {
             state.keypointGraphList[curKPG].push(newKP);
           });
         }
-        setLabelState((state) => {
-          state.curKP = curKP + 1 < kpLen ? curKP + 1 : kpLen - 1;
-        });
+        newCurKP = curKP + 1 < kpLen ? curKP + 1 : kpLen - 1;
+        if (newCurKP !== curKP) {
+          setLabelState((state) => {
+            state.curKP = newCurKP;
+            state.curProps = getKPDefaultProps(newCurKP);
+          });
+        }
       } else if (e.event.data.button === 2) {
         // right click
         console.log(`[EVENT]rightmouse ${e.world.x}, ${e.world.y}`);
         // pop keypoint
+        let poppedProps = curProps;
         if (curKP === 0) {
           // tmp: do nothing when current KPG is already empty
           console.log(`curKPG is already EMPTY!`);
         } else {
+          poppedProps = copyProps(
+            keypointGraphList[curKPG][curKP - 1].properties
+          );
           setLabelState((state) => {
             state.keypointGraphList[curKPG].pop();
           });
         }
-        setLabelState((state) => {
-          state.curKP = curKP - 1 >= 0 ? curKP - 1 : 0;
-        });
+        newCurKP = curKP - 1 >= 0 ? curKP - 1 : 0;
+        if (newCurKP !== curKP) {
+          setLabelState((state) => {
+            state.curKP = newCurKP;
+            state.curProps = poppedProps;
+          });
+        }
       }
     }
   }
   // console.log(`PAN: ${panMode}`);
   console.log(keypointGraphList);
+  console.log(curProps['is_visible']);
   return (
     <div className="App">
       <header className="App-header"></header>
@@ -166,7 +205,7 @@ function App() {
             />
           </div>
           <div className="ToolDetail">
-            {toolMode === 'i' ? <InsertKPGTool kpIndex={curKP} /> : null}
+            {toolMode === 'i' ? <InsertKPGTool /> : null}
           </div>
         </div>
         <div className="Stage" ref={stageRef}>

@@ -1,27 +1,36 @@
 import { Checkbox } from 'antd';
+import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import { useLabelStore, labelSelector } from './App';
 import labelingConfig from './labeling_config.json';
 
 interface IConfigPropertyObject {
   type: string;
   title: string;
-  default?: string;
+  default?: string | number | boolean;
 }
 
 interface IConfigProperty {
   [Prop: string]: IConfigPropertyObject;
 }
 
-interface IInsertKPGToolProps {
-  kpIndex: number;
-}
+interface IInsertKPGToolProps {}
 
 export const InsertKPGTool = (props: IInsertKPGToolProps) => {
   // TODO: validate labeling_config and throw error
+  const { curKP, curProps, setLabelState } = useLabelStore(labelSelector);
   const kpgProp: IConfigProperty =
-    labelingConfig.keypointGraph[props.kpIndex].properties;
+    labelingConfig.keypointGraph[curKP].properties;
   const kpPropInput: JSX.Element = (
     <>
       {Object.keys(kpgProp).map((propKey: string) => {
+        function handleCheckboxChange(e: CheckboxChangeEvent) {
+          console.log(
+            `KPG[${curKP}].properties.${propKey} = ${e.target.checked}`
+          );
+          setLabelState((state) => {
+            state.curProps[propKey].value = e.target.checked;
+          });
+        }
         let input: JSX.Element = (
           <span
             key={`propKey-${propKey}`}
@@ -31,11 +40,9 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
           case 'boolean':
             input = (
               <Checkbox
-                onChange={(e) => {
-                  console.log(
-                    `KPG[${props.kpIndex}].properties.${propKey} = ${e.target.checked}`
-                  );
-                }}
+                key={`propKey-${propKey}`}
+                checked={curProps[propKey].value === true}
+                onChange={handleCheckboxChange}
               >
                 {propKey}
               </Checkbox>
@@ -55,7 +62,7 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
       <div style={{ fontSize: 'small' }}>
         {labelingConfig.keypointGraph.map((kp: any, idx) => {
           const textStyle =
-            props.kpIndex === idx
+            curKP === idx
               ? { backgroundColor: 'Tomato', color: 'Darkblue' }
               : {};
           return idx === labelingConfig.keypointGraph.length - 1 ? (
@@ -67,7 +74,10 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
               <span key={`keypoint-hint-${idx}`} style={textStyle}>
                 {kp.name}
               </span>
-              <span style={{ color: 'cornsilk' }}>{` -> `}</span>
+              <span
+                key={`keypoint-hint-arrow-${idx}`}
+                style={{ color: 'cornsilk' }}
+              >{` -> `}</span>
             </>
           );
         })}

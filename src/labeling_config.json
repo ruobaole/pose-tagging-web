@@ -9,7 +9,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -22,7 +22,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -35,7 +35,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -48,7 +48,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -61,7 +61,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -74,7 +74,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -87,7 +87,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -100,7 +100,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -113,7 +113,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -126,7 +126,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -139,7 +139,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -152,7 +152,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -165,7 +165,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -178,7 +178,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -191,7 +191,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -204,7 +204,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -217,7 +217,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -230,7 +230,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -243,7 +243,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -256,7 +256,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -269,7 +269,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -282,7 +282,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -295,7 +295,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -308,7 +308,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -321,7 +321,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -334,7 +334,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -347,7 +347,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -360,7 +360,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     },
@@ -373,7 +373,7 @@
         "is_visible": {
           "type": "boolean",
           "title": "is_visible",
-          "default": "true"
+          "default": true
         }
       }
     }
