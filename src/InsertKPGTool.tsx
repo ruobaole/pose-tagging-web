@@ -23,7 +23,9 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
     <>
       {Object.keys(kpgProp).map((propKey: string) => {
         let input: JSX.Element = (
-          <span>{`${propKey}: cannot render this property`}</span>
+          <span
+            key={`propKey-${propKey}`}
+          >{`${propKey}: cannot render this property`}</span>
         );
         switch (kpgProp[propKey]['type']) {
           case 'boolean':
@@ -57,10 +59,14 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
               ? { backgroundColor: 'Tomato', color: 'Darkblue' }
               : {};
           return idx === labelingConfig.keypointGraph.length - 1 ? (
-            <span style={textStyle}>{kp.name}</span>
+            <span key={`keypoint-hint-${idx}`} style={textStyle}>
+              {kp.name}
+            </span>
           ) : (
             <>
-              <span style={textStyle}>{kp.name}</span>
+              <span key={`keypoint-hint-${idx}`} style={textStyle}>
+                {kp.name}
+              </span>
               <span style={{ color: 'cornsilk' }}>{` -> `}</span>
             </>
           );
