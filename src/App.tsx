@@ -50,14 +50,14 @@ function App() {
     if (toolMode === 'i') {
       if (e.event.data.button === 0) {
         // left click
-        console.log(`left ${e.world.x}, ${e.world.y}`);
+        console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
         setKx(e.world.x);
         setKy(e.world.y);
         setcurKPIndex((curKPIndex + 1) % kpLen);
       } else if (e.event.data.button === 2) {
         // right click
         setcurKPIndex((curKPIndex - 1 + kpLen) % kpLen);
-        console.log(`right ${e.world.x}, ${e.world.y}`);
+        console.log(`[EVENT]rightmouse ${e.world.x}, ${e.world.y}`);
       }
     }
   }
