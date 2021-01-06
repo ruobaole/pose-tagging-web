@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import create from 'zustand';
+import produce from 'immer';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
@@ -10,6 +11,7 @@ import { InsertKPGTool } from './InsertKPGTool';
 import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
 import labelingConfig from './labeling_config.json';
+import { State } from 'pixi.js';
 
 // store states
 type SetupState = {
@@ -17,27 +19,55 @@ type SetupState = {
   stageSize: [number, number]; // width, height
   setStageSize: (w: number, h: number) => void;
 };
-
 const useSetupStore = create<SetupState>((set) => ({
   imagePath: exampleImage,
   stageSize: [256, 256],
   setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
 }));
+const setupSelector = (state: SetupState) => ({
+  imagePath: state.imagePath,
+  stageSize: state.stageSize,
+  setStageSize: state.setStageSize,
+});
+
+type LabelState = {
+  keypointGraphList: {
+    name: string;
+    x: number;
+    y: number;
+    properties: {
+      [prop: string]: {
+        type: string;
+        value: string | number | boolean;
+      };
+    };
+  }[][];
+  curKPG: number;
+  curKP: number;
+  set: (fn: (state: LabelState) => void) => void;
+};
+const useLabelStore = create<LabelState>((set) => ({
+  keypointGraphList: [],
+  curKPG: 0,
+  curKP: 0,
+  set: (fn) => set(produce(fn)),
+}));
+const labelSelector = (state: LabelState) => ({
+  keypointGraphList: state.keypointGraphList,
+  curKPG: state.curKPG,
+  curKP: state.curKP,
+  setLabelState: state.set,
+});
 
 const kpLen = labelingConfig.keypointGraph.length;
 
 function App() {
-  const setupSelector = (state: SetupState) => ({
-    imagePath: state.imagePath,
-    stageSize: state.stageSize,
-    setStageSize: state.setStageSize,
-  });
   const { imagePath, stageSize, setStageSize } = useSetupStore(setupSelector);
+  const { curKPG, curKP, setLabelState } = useLabelStore(labelSelector);
   const [panMode, setPanMode] = useState<boolean>(false);
   const [toolMode, setToolMode] = useState<string>('i');
   const [kx, setKx] = useState<number>(80);
   const [ky, setKy] = useState<number>(80);
-  const [curKPIndex, setcurKPIndex] = useState<number>(0);
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
@@ -70,10 +100,14 @@ function App() {
         console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
         setKx(e.world.x);
         setKy(e.world.y);
-        setcurKPIndex((curKPIndex + 1) % kpLen);
+        setLabelState((state) => {
+          state.curKP = curKP + 1 < kpLen ? curKP + 1 : kpLen - 1;
+        });
       } else if (e.event.data.button === 2) {
         // right click
-        setcurKPIndex((curKPIndex - 1 + kpLen) % kpLen);
+        setLabelState((state) => {
+          state.curKP = curKP - 1 >= 0 ? curKP - 1 : 0;
+        });
         console.log(`[EVENT]rightmouse ${e.world.x}, ${e.world.y}`);
       }
     }
@@ -97,7 +131,7 @@ function App() {
             />
           </div>
           <div className="ToolDetail">
-            {toolMode === 'i' ? <InsertKPGTool kpIndex={curKPIndex} /> : null}
+            {toolMode === 'i' ? <InsertKPGTool kpIndex={curKP} /> : null}
           </div>
         </div>
         <div className="Stage" ref={stageRef}>
