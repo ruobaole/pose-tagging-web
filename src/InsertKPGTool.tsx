@@ -1,5 +1,3 @@
-import Column from 'antd/lib/table/Column';
-import { useState } from 'react';
 import { Checkbox } from 'antd';
 import labelingConfig from './labeling_config.json';
 

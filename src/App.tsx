@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import create from 'zustand';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
@@ -10,11 +11,28 @@ import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
 import labelingConfig from './labeling_config.json';
 
+// store states
+type SetupState = {
+  imagePath: string;
+  stageSize: [number, number]; // width, height
+  setStageSize: (w: number, h: number) => void;
+};
+
+const useSetupStore = create<SetupState>((set) => ({
+  imagePath: exampleImage,
+  stageSize: [256, 256],
+  setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
+}));
+
+const kpLen = labelingConfig.keypointGraph.length;
+
 function App() {
-  const kpLen = labelingConfig.keypointGraph.length;
-  const [imagePath, setImagePath] = useState<string>(exampleImage);
-  const [stageWidth, setStageWidth] = useState<number>(256);
-  const [stageHeight, setStageHeight] = useState<number>(256);
+  const setupSelector = (state: SetupState) => ({
+    imagePath: state.imagePath,
+    stageSize: state.stageSize,
+    setStageSize: state.setStageSize,
+  });
+  const { imagePath, stageSize, setStageSize } = useSetupStore(setupSelector);
   const [panMode, setPanMode] = useState<boolean>(false);
   const [toolMode, setToolMode] = useState<string>('i');
   const [kx, setKx] = useState<number>(80);
@@ -23,8 +41,7 @@ function App() {
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
-      setStageWidth(stageRef.current.offsetWidth);
-      setStageHeight(stageRef.current.offsetHeight);
+      setStageSize(stageRef.current.offsetWidth, stageRef.current.offsetHeight);
       console.log(
         `${stageRef.current.offsetWidth} * ${stageRef.current.offsetHeight}`
       );
@@ -85,8 +102,8 @@ function App() {
         </div>
         <div className="Stage" ref={stageRef}>
           <Stage
-            width={stageWidth}
-            height={stageHeight}
+            width={stageSize[0]}
+            height={stageSize[1]}
             tabIndex={0}
             style={{ cursor: panMode ? 'move' : 'default' }}
             onKeyPress={handleKeyPress}
@@ -97,8 +114,8 @@ function App() {
             options={{ backgroundColor: 0xfcf8ec }}
           >
             <Viewport
-              width={stageWidth}
-              height={stageHeight}
+              width={stageSize[0]}
+              height={stageSize[1]}
               enablePan={panMode}
               onClicked={handleClicked}
             >
