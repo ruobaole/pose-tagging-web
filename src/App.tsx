@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import create from 'zustand';
+import { mountStoreDevtool } from 'simple-zustand-devtools';
 import produce from 'immer';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
 import { Stage, Sprite } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
-import { Keypoint } from './Keypoint';
+import { KeypointGraph } from './KeypointGraph';
 import { InsertKPGTool } from './InsertKPGTool';
 import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
@@ -17,6 +18,7 @@ const kpLen = labelingConfig.keypointGraph.length;
 export interface IProperties {
   [prop: string]: {
     type: string;
+    title: string;
     value: string | number | boolean;
   };
 }
@@ -26,6 +28,7 @@ function getKPDefaultProps(idx: number) {
   Object.keys(KPGMold[idx].properties).forEach((propName) => {
     defaultProps[propName] = {
       type: (KPGMold[idx].properties as any)[propName].type,
+      title: (KPGMold[idx].properties as any)[propName].title,
       value: (KPGMold[idx].properties as any)[propName].default,
     };
   });
@@ -37,6 +40,7 @@ function copyProps(props0: IProperties) {
   Object.keys(props0).forEach((propName) => {
     newProps[propName] = {
       type: (props0 as any)[propName].type,
+      title: (props0 as any)[propName].title,
       value: (props0 as any)[propName].value,
     };
   });
@@ -68,7 +72,7 @@ type LabelState = {
     properties: IProperties;
   }[][];
   curKPG: number;
-  curKP: number;
+  curKP: number; // can be keypoints.length -- state: add next
   curProps: IProperties;
   set: (fn: (state: LabelState) => void) => void;
 };
@@ -86,6 +90,10 @@ export const labelSelector = (state: LabelState) => ({
   curProps: state.curProps,
   setLabelState: state.set,
 });
+
+if (process.env.NODE_ENV === 'development') {
+  mountStoreDevtool('LabelStore', useLabelStore);
+}
 
 function App() {
   const { imagePath, stageSize, setStageSize } = useSetupStore(setupSelector);
@@ -134,28 +142,31 @@ function App() {
         setKx(e.world.x);
         setKy(e.world.y);
         // add keypoint
-        const newKP = {
-          name: KPGMold[curKP].name,
-          x: e.world.x,
-          y: e.world.y,
-          properties: curProps,
-        };
         if (
-          curKP === kpLen - 1 &&
-          keypointGraphList[curKPG].length === curKP + 1
+          // curKP === kpLen - 1 &&
+          // keypointGraphList[curKPG].length === curKP + 1
+          curKP === kpLen
         ) {
           // tmp: do nothing when current KPG is already full --> push/pop KPG should be controled with button
           console.log(`curKPG is already FULL!`);
         } else {
           setLabelState((state) => {
+            const newKP = {
+              name: KPGMold[curKP].name,
+              x: e.world.x,
+              y: e.world.y,
+              properties: curProps,
+            };
             state.keypointGraphList[curKPG].push(newKP);
           });
         }
-        newCurKP = curKP + 1 < kpLen ? curKP + 1 : kpLen - 1;
+        newCurKP = curKP < kpLen ? curKP + 1 : kpLen;
         if (newCurKP !== curKP) {
           setLabelState((state) => {
             state.curKP = newCurKP;
-            state.curProps = getKPDefaultProps(newCurKP);
+            if (newCurKP < kpLen) {
+              state.curProps = getKPDefaultProps(newCurKP);
+            }
           });
         }
       } else if (e.event.data.button === 2) {
@@ -185,8 +196,8 @@ function App() {
     }
   }
   // console.log(`PAN: ${panMode}`);
-  console.log(keypointGraphList);
-  console.log(curProps['is_visible']);
+  console.log(JSON.stringify(keypointGraphList));
+  // console.log(curProps['is_visible']);
   return (
     <div className="App">
       <header className="App-header"></header>
@@ -228,7 +239,10 @@ function App() {
               onClicked={handleClicked}
             >
               <Sprite image={imagePath} x={0} y={0} />
-              <Keypoint x={kx} y={ky} radius={4} />
+              {/* <Keypoint x={kx} y={ky} radius={4} /> */}
+              {keypointGraphList.map((_, gidx) => {
+                return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
+              })}
             </Viewport>
           </Stage>
         </div>

@@ -46,8 +46,8 @@ const PixiComponentViewport = PixiComponent('Viewport', {
       instance.plugins.pause('pinch');
     }
     instance.removeListener('clicked');
-    if (props.onClicked) {
-      instance.on('clicked', props.onClicked);
+    if (onClicked) {
+      instance.on('clicked', onClicked);
     }
   },
 });
@@ -56,5 +56,3 @@ export const Viewport = (props: IViewportProps) => {
   const app = useApp();
   return <PixiComponentViewport app={app} {...props} />;
 };
-
-// export default Viewport;

@@ -47,6 +47,7 @@
   "devDependencies": {
     "@inlet/react-pixi": "^6.0.6",
     "pixi-viewport": "^4.18.1",
-    "pixi.js": "^5.3.7"
+    "pixi.js": "^5.3.7",
+    "simple-zustand-devtools": "^1.0.0"
   }
 }
