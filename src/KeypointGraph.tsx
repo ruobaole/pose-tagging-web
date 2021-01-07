@@ -23,6 +23,7 @@ export function KeypointGraph(props: IKeypointGraphProps) {
               key={`kp-g${props.graphIdx}-${ikp}`}
               x={kp.x}
               y={kp.y}
+              color={kp.properties['is_visible'].value ? 0xff00ff : 0x84f542} // tmp: hard coded
               radius={4}
             />
             {KPGMold[ikp].neighbors.map((idxn: number, i: number) => {
