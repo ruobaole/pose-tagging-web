@@ -1,6 +1,6 @@
-import { Checkbox } from 'antd';
+import { Checkbox, Button } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import { useLabelStore, labelSelector } from './App';
+import { useLabelStore, labelSelector, kpLen, getKPDefaultProps } from './App';
 import labelingConfig from './labeling_config.json';
 
 interface IConfigPropertyObject {
@@ -13,16 +13,36 @@ interface IConfigProperty {
   [Prop: string]: IConfigPropertyObject;
 }
 
+export const AddNextGraphButton = () => {
+  const { curKP, setLabelState } = useLabelStore(labelSelector);
+  const newCurProps = getKPDefaultProps(0);
+  function handleAddNextGraph() {
+    setLabelState((state) => {
+      state.curKPG += 1;
+      state.curKP = 0;
+      state.keypointGraphList.push([]);
+      state.curProps = newCurProps;
+    });
+  }
+  return (
+    <Button
+      size="small"
+      type="primary"
+      disabled={curKP !== kpLen}
+      onClick={handleAddNextGraph}
+    >
+      ADD NEXT GRAPH
+    </Button>
+  );
+};
+
 interface IInsertKPGToolProps {}
 
 export const InsertKPGTool = (props: IInsertKPGToolProps) => {
   // TODO: validate labeling_config and throw error
-  const configKPGLen = labelingConfig.keypointGraph.length;
   const { curKP, curProps, setLabelState } = useLabelStore(labelSelector);
   const kpgProp: IConfigProperty =
-    curKP < configKPGLen
-      ? labelingConfig.keypointGraph[curKP].properties
-      : curProps;
+    curKP < kpLen ? labelingConfig.keypointGraph[curKP].properties : curProps;
   const kpPropInput: JSX.Element[] = Object.keys(kpgProp).map(
     (propKey: string) => {
       let input: JSX.Element;
@@ -63,10 +83,6 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ fontSize: 'small' }}>
         {labelingConfig.keypointGraph.map((kp: any, idx) => {
-          // const textStyle =
-          //   curKP === idx
-          //     ? { backgroundColor: 'Tomato', color: 'Darkblue' }
-          //     : {};
           return (
             <>
               <span
@@ -86,7 +102,8 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
             </>
           );
         })}
-        <span
+        <AddNextGraphButton />
+        {/* <span
           style={
             curKP === configKPGLen
               ? { backgroundColor: 'Tomato', color: 'Darkblue' }
@@ -94,14 +111,12 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
           }
         >
           ADD NEXT
-        </span>
+        </span> */}
       </div>
-      <div>
-        <div style={{ fontWeight: 700, color: '#456268' }}>
-          Keypoint Properties
-        </div>
-        {kpPropInput}
+      <div style={{ fontWeight: 700, color: '#456268' }}>
+        Keypoint Properties
       </div>
+      {kpPropInput}
     </div>
   );
 };

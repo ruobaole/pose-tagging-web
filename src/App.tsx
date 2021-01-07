@@ -14,7 +14,7 @@ import exampleImage from './example_data/simple002.jpeg';
 import labelingConfig from './labeling_config.json';
 
 const KPGMold = labelingConfig.keypointGraph;
-const kpLen = labelingConfig.keypointGraph.length;
+export const kpLen = labelingConfig.keypointGraph.length;
 export interface IProperties {
   [prop: string]: {
     type: string;
@@ -23,7 +23,7 @@ export interface IProperties {
   };
 }
 
-function getKPDefaultProps(idx: number) {
+export function getKPDefaultProps(idx: number) {
   const defaultProps: IProperties = {};
   Object.keys(KPGMold[idx].properties).forEach((propName) => {
     defaultProps[propName] = {
@@ -196,8 +196,19 @@ function App() {
     }
   }
   // console.log(`PAN: ${panMode}`);
-  console.log(JSON.stringify(keypointGraphList));
-  // console.log(curProps['is_visible']);
+  // console.log(JSON.stringify(keypointGraphList));
+  console.log(
+    `graphLen: ${keypointGraphList.length}; lastGraph.points.length: ${
+      keypointGraphList[keypointGraphList.length - 1].length
+    }`
+  );
+  console.log(
+    `lastGraph.lastPoint: ${JSON.stringify(
+      keypointGraphList[keypointGraphList.length - 1][
+        keypointGraphList[keypointGraphList.length - 1].length - 1
+      ]
+    )}`
+  );
   return (
     <div className="App">
       <header className="App-header"></header>
