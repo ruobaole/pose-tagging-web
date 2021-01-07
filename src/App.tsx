@@ -13,7 +13,7 @@ import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
 import labelingConfig from './labeling_config.json';
 
-const KPGMold = labelingConfig.keypointGraph;
+export const KPGMold = labelingConfig.keypointGraph;
 export const kpLen = labelingConfig.keypointGraph.length;
 export interface IProperties {
   [prop: string]: {
