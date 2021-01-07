@@ -1,0 +1,11 @@
+.ItemList {
+  height: 30%;
+  overflow: auto;
+}
+
+.ItemDetail {
+  background-color: skyblue;
+  flex: 1;
+  max-height: 70%;
+  overflow: auto;
+}

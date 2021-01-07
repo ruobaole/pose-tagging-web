@@ -18,7 +18,7 @@ export const AddNextGraphButton = () => {
   const newCurProps = getKPDefaultProps(0);
   function handleAddNextGraph() {
     setLabelState((state) => {
-      state.curKPG += 1;
+      state.curKPG = state.keypointGraphList.length;
       state.curKP = 0;
       state.keypointGraphList.push([]);
       state.curProps = newCurProps;

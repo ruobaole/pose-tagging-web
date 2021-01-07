@@ -9,6 +9,7 @@ import { Stage, Sprite } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
 import { KeypointGraph } from './KeypointGraph';
 import { InsertKPGTool } from './InsertKPGTool';
+import { LabelDataDisplay } from './LabelDataDisplay';
 import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
 import labelingConfig from './labeling_config.json';
@@ -230,32 +231,36 @@ function App() {
             {toolMode === 'i' ? <InsertKPGTool /> : null}
           </div>
         </div>
-        <div className="Stage" ref={stageRef}>
-          <Stage
-            width={stageSize[0]}
-            height={stageSize[1]}
-            tabIndex={0}
-            style={{ cursor: panMode ? 'move' : 'default' }}
-            onKeyPress={handleKeyPress}
-            onKeyUp={handleKeyUp}
-            onContextMenu={(e) => {
-              e.preventDefault();
-            }}
-            options={{ backgroundColor: 0xfcf8ec }}
-          >
-            <Viewport
+        <div className="StageArea" ref={stageRef}>
+          <div className="Stage">
+            <Stage
               width={stageSize[0]}
               height={stageSize[1]}
-              enablePan={panMode}
-              onClicked={handleClicked}
+              tabIndex={0}
+              style={{ cursor: panMode ? 'move' : 'default' }}
+              onKeyPress={handleKeyPress}
+              onKeyUp={handleKeyUp}
+              onContextMenu={(e) => {
+                e.preventDefault();
+              }}
+              options={{ backgroundColor: 0xfcf8ec }}
             >
-              <Sprite image={imagePath} x={0} y={0} />
-              {/* <Keypoint x={kx} y={ky} radius={4} /> */}
-              {keypointGraphList.map((_, gidx) => {
-                return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
-              })}
-            </Viewport>
-          </Stage>
+              <Viewport
+                width={stageSize[0]}
+                height={stageSize[1]}
+                enablePan={panMode}
+                onClicked={handleClicked}
+              >
+                <Sprite image={imagePath} x={0} y={0} />
+                {keypointGraphList.map((_, gidx) => {
+                  return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
+                })}
+              </Viewport>
+            </Stage>
+          </div>
+          <div className="LabelData">
+            <LabelDataDisplay />
+          </div>
         </div>
       </main>
       <footer className="App-footer"></footer>
