@@ -1,38 +1,67 @@
 import { useState } from 'react';
 import shallow from 'zustand/shallow';
-import { useLabelStore, labelSelector } from './App';
-import { List, Collapse, InputNumber } from 'antd';
+import {
+  KPGMold,
+  kpLen,
+  useLabelStore,
+  labelSelector,
+  PropertyValueType,
+} from './App';
+import { KeypointPropertiesInput } from './InsertKPGTool';
+import { Collapse, InputNumber } from 'antd';
 import './LabelDataDisplay.css';
+import { ClickEventType } from 'pixi-viewport';
 
 const { Panel } = Collapse;
 
+interface IRenderKPGRowProps {
+  kgbIdx: number;
+}
+
+function RenderKPGRow(props: IRenderKPGRowProps) {
+  const pointList = useLabelStore(
+    (state) => Object.keys(state.keypointGraphList[props.kgbIdx]),
+    shallow
+  );
+  return (
+    <>
+      <span>{`Keypoint Graph #${props.kgbIdx}`}</span>
+      <span>{`${pointList.length} points`}</span>
+    </>
+  );
+}
+
 function ItemList() {
+  const selectedRowStyle = {
+    backgroundColor: '#ff7875',
+    color: 'darkblue',
+  };
   const kpgList = useLabelStore(
     (state) => Object.keys(state.keypointGraphList),
     shallow
   );
-  const itemList: string[] = kpgList.map((kpgKey) => {
-    return `Keypoint Graph #${kpgKey}`;
-  });
+  const { curKPG, setLabelState } = useLabelStore(labelSelector);
   return (
     <>
       <div>Item List:</div>
-      <List
-        size="small"
-        bordered
-        dataSource={itemList}
-        renderItem={(item) => (
-          <List.Item
-            style={{
-              fontSize: 'small',
-              color: '#2a3c40',
-              fontFamily: 'monospace',
-            }}
+      {kpgList.map((kpgKey) => {
+        const handleRowClick = (e: React.MouseEvent<HTMLDivElement>) => {
+          setLabelState((state) => {
+            state.curKPG = +kpgKey;
+            state.curKP = state.keypointGraphList[+kpgKey].length;
+          });
+        };
+        return (
+          <div
+            className="ItemRow"
+            style={+kpgKey === curKPG ? selectedRowStyle : {}}
+            key={`${kpgKey}`}
+            onClick={handleRowClick}
           >
-            {item}
-          </List.Item>
-        )}
-      />
+            <RenderKPGRow kgbIdx={+kpgKey} />
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -56,8 +85,8 @@ function PostionInput(props: IPostionInputProps) {
     }
   }
   return (
-    <>
-      <div>
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ marginRight: '1em' }}>
         <span key={`inputx`}>x: </span>
         <InputNumber
           size="small"
@@ -77,7 +106,7 @@ function PostionInput(props: IPostionInputProps) {
           onChange={handleYChange}
         />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -106,6 +135,13 @@ function KeypointsDetail() {
       });
     }
   }
+  function handlePropsChange(propKey: string, newVal: PropertyValueType) {
+    setLabelState((state) => {
+      state.keypointGraphList[curKPG][activeKPIdx].properties[
+        propKey
+      ].value = newVal;
+    });
+  }
   return (
     <Collapse onChange={handleCollapseChange} accordion>
       {kpg.map((kp, idx) => {
@@ -121,7 +157,11 @@ function KeypointsDetail() {
               onXChange={handleXChange}
               onYChange={handleYChange}
             />
-            <p>{JSON.stringify(kp)}</p>
+            <KeypointPropertiesInput
+              configProperties={KPGMold[idx].properties}
+              valProperties={kp.properties}
+              onChange={handlePropsChange}
+            />
           </Panel>
         );
       })}

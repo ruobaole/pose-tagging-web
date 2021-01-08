@@ -9,3 +9,24 @@
   max-height: 70%;
   overflow: auto;
 }
+
+.ItemRow {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: solid;
+  border-bottom-width: 2px;
+  border-top-width: 2px;
+  border-top-style: solid;
+  border-color: gray;
+  font-size: small;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  transition: 0.3s;
+}
+
+.ItemRow:hover {
+  background-color: #ff7875;
+  color: darkblue;
+}

@@ -1,17 +1,15 @@
 import { Checkbox, Button } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import { useLabelStore, labelSelector, kpLen, getKPDefaultProps } from './App';
-import labelingConfig from './labeling_config.json';
-
-interface IConfigPropertyObject {
-  type: string;
-  title: string;
-  default?: string | number | boolean;
-}
-
-interface IConfigProperty {
-  [Prop: string]: IConfigPropertyObject;
-}
+import {
+  KPGMold,
+  useLabelStore,
+  labelSelector,
+  kpLen,
+  getKPDefaultProps,
+  IConfigProperty,
+  IProperties,
+  PropertyValueType,
+} from './App';
 
 export const AddNextGraphButton = () => {
   const { curKP, setLabelState } = useLabelStore(labelSelector);
@@ -36,53 +34,60 @@ export const AddNextGraphButton = () => {
   );
 };
 
-interface IInsertKPGToolProps {}
+interface IKeypointPropertiesInputProps {
+  configProperties: IConfigProperty;
+  valProperties: IProperties;
+  onChange: (propKey: string, newVal: PropertyValueType) => void;
+}
 
-export const InsertKPGTool = (props: IInsertKPGToolProps) => {
+export function KeypointPropertiesInput(props: IKeypointPropertiesInputProps) {
+  const { configProperties, valProperties, onChange } = props;
+  return (
+    <>
+      {Object.keys(configProperties).map((propKey: string) => {
+        let input: JSX.Element;
+        function handleCheckboxChange(e: CheckboxChangeEvent) {
+          onChange(propKey, e.target.checked);
+        }
+        switch (configProperties[propKey]['type']) {
+          case 'boolean':
+            input = (
+              <Checkbox
+                key={`propKey-${propKey}`}
+                checked={valProperties[propKey].value === true}
+                onChange={handleCheckboxChange}
+              >
+                {configProperties[propKey].title}
+              </Checkbox>
+            );
+            break;
+
+          default:
+            input = (
+              <span
+                key={`propKey-invalid-${propKey}`}
+              >{`${propKey}: cannot render this property`}</span>
+            );
+            break;
+        }
+        return input;
+      })}
+    </>
+  );
+}
+
+export const InsertKPGTool = () => {
   // TODO: validate labeling_config and throw error
   const { curKP, curProps, setLabelState } = useLabelStore(labelSelector);
-  const kpgProp: IConfigProperty =
-    curKP < kpLen ? labelingConfig.keypointGraph[curKP].properties : curProps;
-  const kpPropInput: JSX.Element[] = Object.keys(kpgProp).map(
-    (propKey: string) => {
-      let input: JSX.Element;
-      function handleCheckboxChange(e: CheckboxChangeEvent) {
-        console.log(
-          `KPG[${curKP}].properties.${propKey} = ${e.target.checked}`
-        );
-        setLabelState((state) => {
-          state.curProps[propKey].value = e.target.checked;
-        });
-      }
-      switch (kpgProp[propKey]['type']) {
-        case 'boolean':
-          input = (
-            <Checkbox
-              key={`propKey-${propKey}`}
-              checked={curProps[propKey].value === true}
-              onChange={handleCheckboxChange}
-            >
-              {curProps[propKey].title}
-            </Checkbox>
-          );
-          break;
-
-        default:
-          input = (
-            <span
-              key={`propKey-invalid-${propKey}`}
-            >{`${propKey}: cannot render this property`}</span>
-          );
-          break;
-      }
-      return input;
-    }
-  );
-
+  const handlePropChange = (propKey: string, newVal: PropertyValueType) => {
+    setLabelState((state) => {
+      state.curProps[propKey].value = newVal;
+    });
+  };
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ fontSize: 'small' }}>
-        {labelingConfig.keypointGraph.map((kp: any, idx) => {
+        {KPGMold.map((kp: any, idx) => {
           return (
             <>
               <span
@@ -103,20 +108,15 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
           );
         })}
         <AddNextGraphButton />
-        {/* <span
-          style={
-            curKP === configKPGLen
-              ? { backgroundColor: 'Tomato', color: 'Darkblue' }
-              : {}
-          }
-        >
-          ADD NEXT
-        </span> */}
       </div>
       <div style={{ fontWeight: 700, color: '#456268' }}>
         Keypoint Properties
       </div>
-      {kpPropInput}
+      <KeypointPropertiesInput
+        configProperties={curKP < kpLen ? KPGMold[curKP].properties : curProps}
+        valProperties={curProps}
+        onChange={handlePropChange}
+      />
     </div>
   );
 };

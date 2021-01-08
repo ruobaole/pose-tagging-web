@@ -14,13 +14,25 @@ import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
 import labelingConfig from './labeling_config.json';
 
+export { labelingConfig };
 export const KPGMold = labelingConfig.keypointGraph;
 export const kpLen = labelingConfig.keypointGraph.length;
+export type PropertyValueType = string | number | boolean;
+export interface IConfigPropertyObject {
+  type: string;
+  title: string;
+  default?: PropertyValueType;
+}
+
+export interface IConfigProperty {
+  [Prop: string]: IConfigPropertyObject;
+}
+
 export interface IProperties {
   [prop: string]: {
     type: string;
     title: string;
-    value: string | number | boolean;
+    value: PropertyValueType;
   };
 }
 
@@ -146,11 +158,7 @@ function App() {
         setKx(e.world.x);
         setKy(e.world.y);
         // add keypoint
-        if (
-          // curKP === kpLen - 1 &&
-          // keypointGraphList[curKPG].length === curKP + 1
-          curKP === kpLen
-        ) {
+        if (curKP === kpLen) {
           // tmp: do nothing when current KPG is already full --> push/pop KPG should be controled with button
           console.log(`curKPG is already FULL!`);
         } else {
