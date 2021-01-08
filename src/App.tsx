@@ -131,6 +131,9 @@ function App() {
   function handleToolModeChange(e: RadioChangeEvent) {
     setToolMode(e.target.value);
   }
+  function handleLabelAreaWheel(e: React.WheelEvent<HTMLDivElement>) {
+    e.stopPropagation();
+  }
   function handleClicked(e: ClickEventData) {
     if (panMode) {
       return;
@@ -258,7 +261,7 @@ function App() {
               </Viewport>
             </Stage>
           </div>
-          <div className="LabelData">
+          <div className="LabelData" onWheel={handleLabelAreaWheel}>
             <LabelDataDisplay />
           </div>
         </div>

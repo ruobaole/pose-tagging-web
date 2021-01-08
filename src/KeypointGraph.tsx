@@ -13,7 +13,6 @@ export function KeypointGraph(props: IKeypointGraphProps) {
       props.graphIdx,
     ])
   );
-  const c = '0xff5e08';
   return (
     <>
       {kpg.map((kp, ikp) => {
