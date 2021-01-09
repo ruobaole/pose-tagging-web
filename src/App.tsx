@@ -77,6 +77,23 @@ const setupSelector = (state: SetupState) => ({
   setStageSize: state.setStageSize,
 });
 
+type ToolModeType = 'i' | 'e';
+type ControlState = {
+  panMode: boolean;
+  toolMode: ToolModeType;
+  set: (fn: (state: ControlState) => void) => void;
+};
+export const useControlStore = create<ControlState>((set) => ({
+  panMode: false,
+  toolMode: 'i',
+  set: (fn) => set(produce(fn)),
+}));
+export const controlSelector = (state: ControlState) => ({
+  panMode: state.panMode,
+  toolMode: state.toolMode,
+  setControlState: state.set,
+});
+
 type LabelState = {
   keypointGraphList: {
     name: string;
@@ -87,6 +104,8 @@ type LabelState = {
   curKPG: number;
   curKP: number; // can be keypoints.length -- state: add next
   curProps: IProperties;
+  selectedKPG?: number;
+  selectedKP?: number;
   set: (fn: (state: LabelState) => void) => void;
 };
 export const useLabelStore = create<LabelState>((set) => ({
@@ -101,6 +120,8 @@ export const labelSelector = (state: LabelState) => ({
   curKPG: state.curKPG,
   curKP: state.curKP,
   curProps: state.curProps,
+  selectedKPG: state.selectedKPG,
+  selectedKP: state.selectedKP,
   setLabelState: state.set,
 });
 
@@ -117,10 +138,9 @@ function App() {
     keypointGraphList,
     setLabelState,
   } = useLabelStore(labelSelector);
-  const [panMode, setPanMode] = useState<boolean>(false);
-  const [toolMode, setToolMode] = useState<string>('i');
-  const [kx, setKx] = useState<number>(80);
-  const [ky, setKy] = useState<number>(80);
+  const { panMode, toolMode, setControlState } = useControlStore(
+    controlSelector
+  );
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
@@ -132,16 +152,26 @@ function App() {
   }, [stageRef, setStageSize]);
   function handleKeyPress(e: React.KeyboardEvent<any>) {
     if (e.key === ' ' && !e.repeat) {
-      setPanMode(true);
+      setControlState((state) => {
+        state.panMode = true;
+      });
     }
   }
   function handleKeyUp(e: React.KeyboardEvent<any>) {
     if (e.key === ' ' && !e.repeat) {
-      setPanMode(false);
+      setControlState((state) => {
+        state.panMode = false;
+      });
     }
   }
   function handleToolModeChange(e: RadioChangeEvent) {
-    setToolMode(e.target.value);
+    setControlState((state) => {
+      state.toolMode = e.target.value;
+    });
+    setLabelState((state) => {
+      state.selectedKPG = undefined;
+      state.selectedKP = undefined;
+    });
   }
   function handleLabelAreaWheel(e: React.WheelEvent<HTMLDivElement>) {
     e.stopPropagation();
@@ -155,8 +185,6 @@ function App() {
       if (e.event.data.button === 0) {
         // left click
         console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
-        setKx(e.world.x);
-        setKy(e.world.y);
         // add keypoint
         if (curKP === kpLen) {
           // tmp: do nothing when current KPG is already full --> push/pop KPG should be controled with button

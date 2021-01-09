@@ -1,65 +1,100 @@
 import React, { useCallback, useState } from 'react';
 import * as PIXI from 'pixi.js';
+import { GlowFilter } from 'pixi-filters';
 import { Graphics } from '@inlet/react-pixi';
 
 interface IKeypointProps {
   x: number;
   y: number;
+  interative: boolean;
+  highlight: boolean;
+  onPointerDown?: (e: PIXI.InteractionEvent) => void;
+  onDragEnd?: (newX: number, newY: number) => void;
   color?: number;
   alpha?: number;
   radius?: number;
 }
 
 export function Keypoint(props: IKeypointProps) {
-  const [showText, setShowText] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  // store a reference to the data
+  // the reason for this is because of multitouch
+  // we want to track the movement of this particular touch
+  const [draggingData, setDraggingData] = useState<null | PIXI.InteractionData>(
+    null
+  );
+  const glowFilter = new GlowFilter({
+    distance: 15,
+    innerStrength: 2,
+    outerStrength: 2,
+    color: 0xebebb8,
+  });
   const draw = useCallback(
     (g: PIXI.Graphics) => {
+      // setThisGraph(g);
       const radius = props.radius === undefined ? 4 : props.radius;
       const color = props.color === undefined ? 0xff00ff : props.color;
       const alpha = props.alpha === undefined ? 1 : props.alpha;
       g.clear();
       // outer circle
       g.lineStyle(1, color, alpha);
-      g.drawCircle(props.x, props.y, radius);
+      g.drawCircle(0, 0, radius);
+      // select area
       g.lineStyle(0);
-      // center
-      g.beginFill(0xffff0b, 0.7);
-      g.drawCircle(props.x, props.y, 1);
-      // text -- tmp
-      if (showText) {
-        const label = new PIXI.Text(`2-left_eye-visible`, {
-          fontFamily: 'Arial',
-          fontSize: 14,
-          fontWeight: 'bold',
-          fill: '#ffb700',
-          dropShadow: true,
-          dropShadowColor: '#888888',
-          dropShadowBlur: 4,
-          dropShadowAngle: Math.PI / 6,
-          dropShadowDistance: 6,
-        });
-        label.x = props.x - 4;
-        label.y = props.y - 2;
-        g.addChild(label);
-      } else {
-        g.removeChildren();
-      }
+      g.beginFill(0xffff0b, 0);
+      g.drawCircle(0, 0, radius - 1.5);
       g.endFill();
+      // center
+      g.lineStyle(0);
+      g.beginFill(0xffff0b, 0.7);
+      g.drawCircle(0, 0, 1);
+      g.endFill();
+      if (props.highlight) {
+        g.filters = [glowFilter];
+      } else {
+        g.filters = [];
+      }
+      g.position.set(props.x, props.y);
     },
-    [props, showText]
+    [props]
   );
-  const handleMouseOver = (e: PIXI.InteractionEvent) => {
-    setShowText(true);
+  const onPointerDown = (e: PIXI.InteractionEvent) => {
+    if (props.onPointerDown) {
+      props.onPointerDown(e);
+    }
+    onDragStart(e);
   };
-  const handleMouseOut = (e: PIXI.InteractionEvent) => {
-    setShowText(false);
+  const onDragStart = (e: PIXI.InteractionEvent) => {
+    setDraggingData(e.data);
+    setIsDragging(true);
+  };
+  const onDragEnd = (e: PIXI.InteractionEvent) => {
+    setDraggingData(null);
+    setIsDragging(false);
+    if (props.onDragEnd) {
+      props.onDragEnd(e.currentTarget.x, e.currentTarget.y);
+    }
+  };
+  const onDragMove = (e: PIXI.InteractionEvent) => {
+    if (isDragging) {
+      const newPosition = draggingData?.getLocalPosition(
+        e.currentTarget.parent
+      );
+      if (newPosition !== undefined) {
+        e.currentTarget.x = newPosition.x;
+        e.currentTarget.y = newPosition.y;
+      }
+    }
   };
   return (
     <Graphics
       draw={draw}
-      interactive={true}
-      mouseover={handleMouseOver}
-      mouseout={handleMouseOut}
+      interactive={props.interative}
+      buttonMode={props.interative}
+      pointerdown={onPointerDown}
+      pointerup={onDragEnd}
+      pointerupoutside={onDragEnd}
+      pointermove={onDragMove}
     />
   );
 }
