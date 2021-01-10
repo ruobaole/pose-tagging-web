@@ -77,7 +77,7 @@ const setupSelector = (state: SetupState) => ({
   setStageSize: state.setStageSize,
 });
 
-type ToolModeType = 'i' | 'e';
+export type ToolModeType = 'i' | 'e';
 type ControlState = {
   panMode: boolean;
   toolMode: ToolModeType;
