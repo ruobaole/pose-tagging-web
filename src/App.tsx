@@ -95,7 +95,7 @@ export const controlSelector = (state: ControlState) => ({
   setControlState: state.set,
 });
 
-type LabelState = {
+export type LabelState = {
   keypointGraphList: {
     name: string;
     x: number;

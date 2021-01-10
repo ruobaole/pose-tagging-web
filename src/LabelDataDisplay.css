@@ -4,7 +4,7 @@
 }
 
 .ItemDetail {
-  background-color: skyblue;
+  background-color: #f5fdff;
   flex: 1;
   max-height: 70%;
   overflow: auto;
@@ -15,18 +15,19 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  border-bottom: solid;
-  border-bottom-width: 2px;
+  /* border-bottom: solid; */
+  /* border-bottom-width: 1px; */
   border-top-width: 2px;
   border-top-style: solid;
   border-color: gray;
   font-size: small;
   padding-top: 0.2em;
   padding-bottom: 0.2em;
-  transition: 0.3s;
+  padding-left: 0.4em;
+  padding-right: 0.4em;
 }
 
 .ItemRow:hover {
   background-color: #ff7875;
-  color: darkblue;
+  /* color: darkblue; */
 }

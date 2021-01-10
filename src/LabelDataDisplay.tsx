@@ -1,12 +1,14 @@
 import shallow from 'zustand/shallow';
+import { Button, Collapse, InputNumber, Popover } from 'antd';
+import { DeleteTwoTone } from '@ant-design/icons';
 import {
   KPGMold,
   useLabelStore,
   labelSelector,
   PropertyValueType,
+  LabelState,
 } from './App';
 import { KeypointPropertiesInput } from './InsertKPGTool';
-import { Collapse, InputNumber } from 'antd';
 import './LabelDataDisplay.css';
 
 interface IRenderKPGRowProps {
@@ -14,14 +16,29 @@ interface IRenderKPGRowProps {
 }
 
 function RenderKPGRow(props: IRenderKPGRowProps) {
-  const pointList = useLabelStore(
-    (state) => Object.keys(state.keypointGraphList[props.kgbIdx]),
-    shallow
-  );
+  const pointsSelector = (state: LabelState) =>
+    Object.keys(state.keypointGraphList[props.kgbIdx]);
+  const pointList = useLabelStore(pointsSelector, shallow);
+  const handleDelete = () => {
+    console.log(`delete: ${props.kgbIdx}`);
+  };
   return (
     <>
-      <span>{`Keypoint Graph #${props.kgbIdx}`}</span>
-      <span>{`${pointList.length} points`}</span>
+      <span key="name">{`Keypoint Graph #${props.kgbIdx}`}</span>
+      <span key="length">{`${pointList.length} points`}</span>
+      <span>
+        <Popover
+          content={
+            <Button type="primary" size="small" onClick={handleDelete}>
+              Confirm
+            </Button>
+          }
+          title={`Delete this graph?`}
+          trigger="click"
+        >
+          <DeleteTwoTone />
+        </Popover>
+      </span>
     </>
   );
 }
@@ -30,7 +47,7 @@ function KeypointGraphList() {
   const { selectedKPG, setLabelState } = useLabelStore(labelSelector);
   const highlightRowStyle = {
     backgroundColor: '#ff7875',
-    color: 'darkblue',
+    // color: 'darkblue',
   };
   const kpgList = useLabelStore(
     (state) => Object.keys(state.keypointGraphList),
