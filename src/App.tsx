@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import create from 'zustand';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import produce from 'immer';
@@ -17,7 +17,7 @@ import labelingConfig from './labeling_config.json';
 export { labelingConfig };
 export const KPGMold = labelingConfig.keypointGraph;
 export const kpLen = labelingConfig.keypointGraph.length;
-export type PropertyValueType = string | number | boolean;
+export type PropertyValueType = string | number | boolean | undefined;
 export interface IConfigPropertyObject {
   type: string;
   title: string;
@@ -101,25 +101,20 @@ type LabelState = {
     y: number;
     properties: IProperties;
   }[][];
-  curKPG: number;
-  curKP: number; // can be keypoints.length -- state: add next
-  curProps: IProperties;
-  selectedKPG?: number;
+  nextProps: IProperties;
+  selectedKPG: number;
   selectedKP?: number;
   set: (fn: (state: LabelState) => void) => void;
 };
 export const useLabelStore = create<LabelState>((set) => ({
   keypointGraphList: [[]],
-  curKPG: 0,
-  curKP: 0,
-  curProps: getKPDefaultProps(0),
+  selectedKPG: 0,
+  nextProps: getKPDefaultProps(0),
   set: (fn) => set(produce(fn)),
 }));
 export const labelSelector = (state: LabelState) => ({
   keypointGraphList: state.keypointGraphList,
-  curKPG: state.curKPG,
-  curKP: state.curKP,
-  curProps: state.curProps,
+  nextProps: state.nextProps,
   selectedKPG: state.selectedKPG,
   selectedKP: state.selectedKP,
   setLabelState: state.set,
@@ -132,9 +127,8 @@ if (process.env.NODE_ENV === 'development') {
 function App() {
   const { imagePath, stageSize, setStageSize } = useSetupStore(setupSelector);
   const {
-    curKPG,
-    curKP,
-    curProps,
+    selectedKPG,
+    nextProps,
     keypointGraphList,
     setLabelState,
   } = useLabelStore(labelSelector);
@@ -168,44 +162,33 @@ function App() {
     setControlState((state) => {
       state.toolMode = e.target.value;
     });
-    setLabelState((state) => {
-      state.selectedKPG = undefined;
-      state.selectedKP = undefined;
-    });
   }
   function handleLabelAreaWheel(e: React.WheelEvent<HTMLDivElement>) {
     e.stopPropagation();
   }
-  function handleClicked(e: ClickEventData) {
+  function handleViewportClicked(e: ClickEventData) {
     if (panMode) {
       return;
     }
     if (toolMode === 'i') {
-      let newCurKP: number = curKP;
       if (e.event.data.button === 0) {
         // left click
         console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
         // add keypoint
-        if (curKP === kpLen) {
-          // tmp: do nothing when current KPG is already full --> push/pop KPG should be controled with button
-          console.log(`curKPG is already FULL!`);
+        if (keypointGraphList[selectedKPG].length === kpLen) {
+          console.log(`this keypoint graph is already FULL!`);
         } else {
+          const nextPointIdx = keypointGraphList[selectedKPG].length;
+          const newKP = {
+            name: KPGMold[nextPointIdx].name,
+            x: e.world.x,
+            y: e.world.y,
+            properties: nextProps,
+          };
           setLabelState((state) => {
-            const newKP = {
-              name: KPGMold[curKP].name,
-              x: e.world.x,
-              y: e.world.y,
-              properties: curProps,
-            };
-            state.keypointGraphList[curKPG].push(newKP);
-          });
-        }
-        newCurKP = curKP < kpLen ? curKP + 1 : kpLen;
-        if (newCurKP !== curKP) {
-          setLabelState((state) => {
-            state.curKP = newCurKP;
-            if (newCurKP < kpLen) {
-              state.curProps = getKPDefaultProps(newCurKP);
+            state.keypointGraphList[selectedKPG].push(newKP);
+            if (nextPointIdx + 1 < kpLen) {
+              state.nextProps = getKPDefaultProps(nextPointIdx + 1);
             }
           });
         }
@@ -213,23 +196,14 @@ function App() {
         // right click
         console.log(`[EVENT]rightmouse ${e.world.x}, ${e.world.y}`);
         // pop keypoint
-        let poppedProps = curProps;
-        if (curKP === 0) {
-          // tmp: do nothing when current KPG is already empty
-          console.log(`curKPG is already EMPTY!`);
+        if (keypointGraphList[selectedKPG].length === 0) {
+          console.log(`this keypoint graph is already EMPTY!`);
         } else {
-          poppedProps = copyProps(
-            keypointGraphList[curKPG][curKP - 1].properties
-          );
           setLabelState((state) => {
-            state.keypointGraphList[curKPG].pop();
-          });
-        }
-        newCurKP = curKP - 1 >= 0 ? curKP - 1 : 0;
-        if (newCurKP !== curKP) {
-          setLabelState((state) => {
-            state.curKP = newCurKP;
-            state.curProps = poppedProps;
+            const popped = state.keypointGraphList[selectedKPG].pop();
+            if (popped) {
+              state.nextProps = copyProps(popped.properties);
+            }
           });
         }
       }
@@ -237,18 +211,18 @@ function App() {
   }
   // console.log(`PAN: ${panMode}`);
   // console.log(JSON.stringify(keypointGraphList));
-  console.log(
-    `graphLen: ${keypointGraphList.length}; lastGraph.points.length: ${
-      keypointGraphList[keypointGraphList.length - 1].length
-    }`
-  );
-  console.log(
-    `lastGraph.lastPoint: ${JSON.stringify(
-      keypointGraphList[keypointGraphList.length - 1][
-        keypointGraphList[keypointGraphList.length - 1].length - 1
-      ]
-    )}`
-  );
+  // console.log(
+  //   `graphLen: ${keypointGraphList.length}; lastGraph.points.length: ${
+  //     keypointGraphList[keypointGraphList.length - 1].length
+  //   }`
+  // );
+  // console.log(
+  //   `lastGraph.lastPoint: ${JSON.stringify(
+  //     keypointGraphList[keypointGraphList.length - 1][
+  //       keypointGraphList[keypointGraphList.length - 1].length - 1
+  //     ]
+  //   )}`
+  // );
   return (
     <div className="App">
       <header className="App-header"></header>
@@ -267,7 +241,11 @@ function App() {
             />
           </div>
           <div className="ToolDetail">
-            {toolMode === 'i' ? <InsertKPGTool /> : null}
+            {toolMode === 'i' ? (
+              <InsertKPGTool
+                nextPointIdx={keypointGraphList[selectedKPG].length}
+              />
+            ) : null}
           </div>
         </div>
         <div className="StageArea" ref={stageRef}>
@@ -288,7 +266,7 @@ function App() {
                 width={stageSize[0]}
                 height={stageSize[1]}
                 enablePan={panMode}
-                onClicked={handleClicked}
+                onClicked={handleViewportClicked}
               >
                 <Sprite image={imagePath} x={0} y={0} />
                 {keypointGraphList.map((_, gidx) => {

@@ -11,29 +11,6 @@ import {
   PropertyValueType,
 } from './App';
 
-export const AddNextGraphButton = () => {
-  const { curKP, setLabelState } = useLabelStore(labelSelector);
-  const newCurProps = getKPDefaultProps(0);
-  function handleAddNextGraph() {
-    setLabelState((state) => {
-      state.curKPG = state.keypointGraphList.length;
-      state.curKP = 0;
-      state.keypointGraphList.push([]);
-      state.curProps = newCurProps;
-    });
-  }
-  return (
-    <Button
-      size="small"
-      type="primary"
-      disabled={curKP !== kpLen}
-      onClick={handleAddNextGraph}
-    >
-      ADD NEXT GRAPH
-    </Button>
-  );
-};
-
 interface IKeypointPropertiesInputProps {
   configProperties: IConfigProperty;
   valProperties: IProperties;
@@ -45,6 +22,10 @@ export function KeypointPropertiesInput(props: IKeypointPropertiesInputProps) {
   return (
     <>
       {Object.keys(configProperties).map((propKey: string) => {
+        const value: PropertyValueType =
+          valProperties[propKey] === undefined
+            ? configProperties[propKey].default
+            : valProperties[propKey].value;
         let input: JSX.Element;
         function handleCheckboxChange(e: CheckboxChangeEvent) {
           onChange(propKey, e.target.checked);
@@ -54,7 +35,7 @@ export function KeypointPropertiesInput(props: IKeypointPropertiesInputProps) {
             input = (
               <Checkbox
                 key={`propKey-${propKey}`}
-                checked={valProperties[propKey].value === true}
+                checked={value === true}
                 onChange={handleCheckboxChange}
               >
                 {configProperties[propKey].title}
@@ -76,14 +57,25 @@ export function KeypointPropertiesInput(props: IKeypointPropertiesInputProps) {
   );
 }
 
-export const InsertKPGTool = () => {
-  // TODO: validate labeling_config and throw error
-  const { curKP, curProps, setLabelState } = useLabelStore(labelSelector);
+interface IInsertKPGToolProps {
+  nextPointIdx: number;
+}
+
+export const InsertKPGTool = (props: IInsertKPGToolProps) => {
+  const { nextProps, setLabelState } = useLabelStore(labelSelector);
   const handlePropChange = (propKey: string, newVal: PropertyValueType) => {
     setLabelState((state) => {
-      state.curProps[propKey].value = newVal;
+      state.nextProps[propKey].value = newVal;
     });
   };
+  function handleAddNextGraph() {
+    setLabelState((state) => {
+      state.selectedKPG = state.keypointGraphList.length;
+      state.selectedKP = undefined;
+      state.keypointGraphList.push([]);
+      state.nextProps = getKPDefaultProps(0);
+    });
+  }
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div key="title-area" style={{ fontWeight: 700, color: '#456268' }}>
@@ -96,7 +88,7 @@ export const InsertKPGTool = () => {
               <span
                 key={`keypoint-hint-${idx}`}
                 style={
-                  curKP === idx
+                  props.nextPointIdx === idx
                     ? { backgroundColor: 'Tomato', color: 'Darkblue' }
                     : {}
                 }
@@ -110,11 +102,18 @@ export const InsertKPGTool = () => {
             </>
           );
         })}
-        <AddNextGraphButton />
+        <Button
+          size="small"
+          type="primary"
+          disabled={props.nextPointIdx !== kpLen}
+          onClick={handleAddNextGraph}
+        >
+          ADD NEXT GRAPH
+        </Button>
       </div>
       <KeypointPropertiesInput
-        configProperties={curKP < kpLen ? KPGMold[curKP].properties : curProps}
-        valProperties={curProps}
+        configProperties={nextProps}
+        valProperties={nextProps}
         onChange={handlePropChange}
       />
     </div>

@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import shallow from 'zustand/shallow';
 import {
   KPGMold,
   useLabelStore,
   labelSelector,
   PropertyValueType,
-  useControlStore,
-  controlSelector,
 } from './App';
 import { KeypointPropertiesInput } from './InsertKPGTool';
 import { Collapse, InputNumber } from 'antd';
@@ -29,12 +26,8 @@ function RenderKPGRow(props: IRenderKPGRowProps) {
   );
 }
 
-interface IKeypointGraphListProps {
-  onKPGChange: (newIdx?: number) => void;
-  kpgIdx?: number;
-}
-
-function KeypointGraphList(props: IKeypointGraphListProps) {
+function KeypointGraphList() {
+  const { selectedKPG, setLabelState } = useLabelStore(labelSelector);
   const highlightRowStyle = {
     backgroundColor: '#ff7875',
     color: 'darkblue',
@@ -47,16 +40,15 @@ function KeypointGraphList(props: IKeypointGraphListProps) {
     <>
       {kpgList.map((kpgKey) => {
         const handleRowClick = (e: React.MouseEvent<HTMLDivElement>) => {
-          props.onKPGChange(+kpgKey);
+          setLabelState((state) => {
+            state.selectedKPG = +kpgKey;
+            state.selectedKP = undefined;
+          });
         };
         return (
           <div
             className="ItemRow"
-            style={
-              props.kpgIdx !== undefined && props.kpgIdx === +kpgKey
-                ? highlightRowStyle
-                : {}
-            }
+            style={selectedKPG === +kpgKey ? highlightRowStyle : {}}
             key={`${kpgKey}`}
             onClick={handleRowClick}
           >
@@ -112,63 +104,41 @@ function PostionInput(props: IPostionInputProps) {
   );
 }
 
-interface IKeypointGraphDetailProps {
-  kpgIdx: number;
-}
-
-function KeypointGraphDetail(props: IKeypointGraphDetailProps) {
-  const { keypointGraphList, selectedKP, setLabelState } = useLabelStore(
-    labelSelector
-  );
-  const { toolMode } = useControlStore(controlSelector);
-  const [activeKPIdx, setActiveKPIdx] = useState(NaN);
-  const kpg = keypointGraphList[props.kpgIdx];
+function KeypointGraphDetail() {
+  const {
+    keypointGraphList,
+    selectedKPG,
+    selectedKP,
+    setLabelState,
+  } = useLabelStore(labelSelector);
+  const kpg = keypointGraphList[selectedKPG];
   function handleCollapseChange(panelKey: string | string[]) {
     let idx: number | undefined = undefined;
-    console.log(panelKey);
     if (panelKey !== undefined && typeof panelKey === typeof '') {
       idx = +panelKey;
     }
-    if (toolMode === 'e') {
-      setLabelState((state) => {
-        state.selectedKP = idx;
-      });
-    } else if (toolMode === 'i') {
-      setActiveKPIdx(idx === undefined ? NaN : idx);
-    }
+    setLabelState((state) => {
+      state.selectedKP = idx;
+    });
   }
   function handleXChange(newX: number) {
-    if (toolMode === 'e' && selectedKP !== undefined) {
+    if (selectedKP !== undefined) {
       setLabelState((state) => {
-        state.keypointGraphList[props.kpgIdx][selectedKP].x = newX;
-      });
-    } else if (toolMode === 'i' && !isNaN(activeKPIdx)) {
-      setLabelState((state) => {
-        state.keypointGraphList[props.kpgIdx][activeKPIdx].x = newX;
+        state.keypointGraphList[selectedKPG][selectedKP].x = newX;
       });
     }
   }
   function handleYChange(newY: number) {
-    if (toolMode === 'e' && selectedKP !== undefined) {
+    if (selectedKP !== undefined) {
       setLabelState((state) => {
-        state.keypointGraphList[props.kpgIdx][selectedKP].y = newY;
-      });
-    } else if (toolMode === 'i' && !isNaN(activeKPIdx)) {
-      setLabelState((state) => {
-        state.keypointGraphList[props.kpgIdx][activeKPIdx].y = newY;
+        state.keypointGraphList[selectedKPG][selectedKP].y = newY;
       });
     }
   }
   function handlePropsChange(propKey: string, newVal: PropertyValueType) {
-    if (toolMode === 'e' && selectedKP !== undefined) {
+    if (selectedKP !== undefined) {
       setLabelState((state) => {
-        state.keypointGraphList[props.kpgIdx][selectedKP].properties[
-          propKey
-        ].value = newVal;
-      });
-    } else if (toolMode === 'i' && !isNaN(activeKPIdx)) {
-      setLabelState((state) => {
-        state.keypointGraphList[props.kpgIdx][activeKPIdx].properties[
+        state.keypointGraphList[selectedKPG][selectedKP].properties[
           propKey
         ].value = newVal;
       });
@@ -177,7 +147,7 @@ function KeypointGraphDetail(props: IKeypointGraphDetailProps) {
   return (
     <Collapse
       onChange={handleCollapseChange}
-      activeKey={toolMode === 'e' ? '' + selectedKP : '' + activeKPIdx}
+      activeKey={'' + selectedKP}
       accordion
     >
       {kpg.map((kp, idx) => {
@@ -206,34 +176,16 @@ function KeypointGraphDetail(props: IKeypointGraphDetailProps) {
 }
 
 export function LabelDataDisplay() {
-  const { curKPG, selectedKPG, setLabelState } = useLabelStore(labelSelector);
-  const { toolMode } = useControlStore(controlSelector);
-  const handleKPGChange = (newKPG?: number) => {
-    if (toolMode === 'i') {
-      if (newKPG !== undefined) {
-        setLabelState((state) => {
-          state.curKPG = newKPG;
-          state.curKP = state.keypointGraphList[newKPG].length;
-        });
-      }
-    } else if (toolMode === 'e') {
-      setLabelState((state) => {
-        state.selectedKPG = newKPG;
-        state.selectedKP = undefined;
-      });
-    }
-  };
-  const kpgIdx: number | undefined = toolMode === 'e' ? selectedKPG : curKPG;
   return (
     <>
       Label Data
-      <div className="ItemList">
+      <div key="KeypointGraphList" className="ItemList">
         <div>Item List:</div>
-        <KeypointGraphList kpgIdx={kpgIdx} onKPGChange={handleKPGChange} />
+        <KeypointGraphList />
       </div>
-      <div className="ItemDetail">
+      <div key="KeypointGraphDetail" className="ItemDetail">
         <div>Detail:</div>
-        {kpgIdx === undefined ? null : <KeypointGraphDetail kpgIdx={kpgIdx} />}
+        <KeypointGraphDetail />
       </div>
     </>
   );
