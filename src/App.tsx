@@ -36,7 +36,8 @@ export interface IProperties {
   };
 }
 
-export function getKPDefaultProps(idx: number) {
+export function getKPDefaultProps(idx0: number) {
+  let idx = idx0 >= 0 ? idx0 % kpLen : kpLen - ((-1 * idx0) % kpLen);
   const defaultProps: IProperties = {};
   Object.keys(KPGMold[idx].properties).forEach((propName) => {
     defaultProps[propName] = {

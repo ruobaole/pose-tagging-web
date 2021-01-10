@@ -68,12 +68,21 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
       state.nextProps[propKey].value = newVal;
     });
   };
-  function handleAddNextGraph() {
+  function handleNextGraph() {
     setLabelState((state) => {
-      state.selectedKPG = state.keypointGraphList.length;
+      if (state.selectedKPG === state.keypointGraphList.length - 1) {
+        // last graph -> add one
+        state.selectedKPG = state.keypointGraphList.length;
+        state.keypointGraphList.push([]);
+        state.nextProps = getKPDefaultProps(0);
+      } else {
+        //not last graph -> to next one
+        state.nextProps = getKPDefaultProps(
+          state.keypointGraphList[state.selectedKPG + 1].length
+        );
+        state.selectedKPG += 1;
+      }
       state.selectedKP = undefined;
-      state.keypointGraphList.push([]);
-      state.nextProps = getKPDefaultProps(0);
     });
   }
   return (
@@ -106,9 +115,9 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
           size="small"
           type="primary"
           disabled={props.nextPointIdx !== kpLen}
-          onClick={handleAddNextGraph}
+          onClick={handleNextGraph}
         >
-          ADD NEXT GRAPH
+          NEXT GRAPH
         </Button>
       </div>
       <KeypointPropertiesInput
