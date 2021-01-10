@@ -86,7 +86,10 @@ export const InsertKPGTool = () => {
   };
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ fontSize: 'small' }}>
+      <div key="title-area" style={{ fontWeight: 700, color: '#456268' }}>
+        Next Point
+      </div>
+      <div key="input-area" style={{ fontSize: 'small' }}>
         {KPGMold.map((kp: any, idx) => {
           return (
             <>
@@ -108,9 +111,6 @@ export const InsertKPGTool = () => {
           );
         })}
         <AddNextGraphButton />
-      </div>
-      <div style={{ fontWeight: 700, color: '#456268' }}>
-        Keypoint Properties
       </div>
       <KeypointPropertiesInput
         configProperties={curKP < kpLen ? KPGMold[curKP].properties : curProps}
