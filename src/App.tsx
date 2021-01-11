@@ -5,10 +5,12 @@ import produce from 'immer';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
-import { Stage, Sprite } from '@inlet/react-pixi';
+import { Stage } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
+import { ImageSprite } from './ImageSprite';
 import { KeypointGraph } from './KeypointGraph';
 import { InsertKPGTool } from './InsertKPGTool';
+import { Footer } from './Footer';
 import { LabelDataDisplay } from './LabelDataDisplay';
 import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
@@ -64,18 +66,30 @@ function copyProps(props0: IProperties) {
 // store states
 type SetupState = {
   imagePath: string;
+  imageLoading: boolean;
+  imageLoadError?: string;
   stageSize: [number, number]; // width, height
   setStageSize: (w: number, h: number) => void;
+  set: (fn: (state: SetupState) => void) => void;
 };
-const useSetupStore = create<SetupState>((set) => ({
-  imagePath: exampleImage,
+export const useSetupStore = create<SetupState>((set) => ({
+  // imagePath: exampleImage,
+  // imagePath: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/coin.png',
+  // imagePath:
+  //   'https://github.com/ruobaole/pose-tagging-web/blob/master/src/example_data/simple002.jpeg',
+  imagePath: 'https://via.placeholder.com/1080',
+  imageLoading: false,
   stageSize: [256, 256],
+  set: (fn) => set(produce(fn)),
   setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
 }));
-const setupSelector = (state: SetupState) => ({
+export const setupSelector = (state: SetupState) => ({
   imagePath: state.imagePath,
   stageSize: state.stageSize,
+  imageLoading: state.imageLoading,
+  imageLoadError: state.imageLoadError,
   setStageSize: state.setStageSize,
+  setSetupState: state.set,
 });
 
 export type ToolModeType = 'i' | 'e';
@@ -126,7 +140,13 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 function App() {
-  const { imagePath, stageSize, setStageSize } = useSetupStore(setupSelector);
+  const {
+    imagePath,
+    imageLoadError,
+    imageLoading,
+    stageSize,
+    setStageSize,
+  } = useSetupStore(setupSelector);
   const {
     selectedKPG,
     nextProps,
@@ -213,6 +233,7 @@ function App() {
   function getDownloadContent() {
     return {
       configVersion: (labelingConfig as any)['configVersion'],
+      imagePath: imagePath,
       keypointGraphList: keypointGraphList,
     };
   }
@@ -235,7 +256,10 @@ function App() {
     console.log(`selectedKPG: ${selectedKPG}`);
   }
   return (
-    <div className="App">
+    <div
+      className="App"
+      style={{ cursor: imageLoading ? 'progress' : 'default' }}
+    >
       <header className="App-header"></header>
       <main className="App-main">
         <div className="Tools">
@@ -279,7 +303,7 @@ function App() {
                 enablePan={panMode}
                 onClicked={handleViewportClicked}
               >
-                <Sprite image={imagePath} x={0} y={0} />
+                <ImageSprite />
                 {keypointGraphList.map((_, gidx) => {
                   return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
                 })}
@@ -292,12 +316,17 @@ function App() {
               ? '[left click] to insert new keypoint; [right click] to pop out keypoint;'
               : '[left click] to select and drag keypoint;'}
           </div>
+          <div className="ErrorNote" hidden={!imageLoadError}>
+            Image Load Error
+          </div>
           <div className="LabelData" onWheel={handleLabelAreaWheel}>
             <LabelDataDisplay downloadContent={getDownloadContent()} />
           </div>
         </div>
       </main>
-      <footer className="App-footer"></footer>
+      <footer className="App-footer">
+        <Footer />
+      </footer>
     </div>
   );
 }

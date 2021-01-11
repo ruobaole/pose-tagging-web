@@ -1,0 +1,4 @@
+.FooterWrapper {
+  display: flex;
+  flex-direction: column;
+}
