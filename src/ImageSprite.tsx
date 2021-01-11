@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 import { Sprite } from '@inlet/react-pixi';
 import { useSetupStore, setupSelector } from './App';
 
+// TODO: rewrite <Sprite/> using custom component to handle loading error correctly ----
+// https://stackoverflow.com/questions/62720311/loading-pixi-textures-handling-failures
+
 export function ImageSprite() {
   const {
     imagePath,
@@ -12,7 +15,6 @@ export function ImageSprite() {
   const imageElement: HTMLImageElement = new Image();
   const handleLoadError = (e: Event | string, src?: string) => {
     console.log('eeeeee');
-    // console.error(e);
     setSetupState((state) => {
       state.imageLoadError = e.toString();
     });
@@ -31,7 +33,7 @@ export function ImageSprite() {
     });
   };
   imageElement.src = imagePath;
-  imageElement.crossOrigin = 'Anonymous';
+  imageElement.crossOrigin = '';
   imageElement.onerror = handleLoadError;
   imageElement.onloadstart = handleLoadStart;
   imageElement.onload = handleLoad;

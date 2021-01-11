@@ -5,9 +5,9 @@ import produce from 'immer';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
-import { Stage } from '@inlet/react-pixi';
+import { Stage, Sprite } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
-import { ImageSprite } from './ImageSprite';
+// import { ImageSprite } from './ImageSprite';
 import { KeypointGraph } from './KeypointGraph';
 import { InsertKPGTool } from './InsertKPGTool';
 import { Footer } from './Footer';
@@ -73,11 +73,11 @@ type SetupState = {
   set: (fn: (state: SetupState) => void) => void;
 };
 export const useSetupStore = create<SetupState>((set) => ({
-  // imagePath: exampleImage,
+  imagePath: exampleImage,
   // imagePath: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/coin.png',
   // imagePath:
   //   'https://github.com/ruobaole/pose-tagging-web/blob/master/src/example_data/simple002.jpeg',
-  imagePath: 'https://via.placeholder.com/1080',
+  // imagePath: 'https://via.placeholder.com/1080',
   imageLoading: false,
   stageSize: [256, 256],
   set: (fn) => set(produce(fn)),
@@ -143,9 +143,9 @@ function App() {
   const {
     imagePath,
     imageLoadError,
-    imageLoading,
     stageSize,
     setStageSize,
+    setSetupState,
   } = useSetupStore(setupSelector);
   const {
     selectedKPG,
@@ -157,6 +157,7 @@ function App() {
     controlSelector
   );
   const stageRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
       setStageSize(stageRef.current.offsetWidth, stageRef.current.offsetHeight);
@@ -165,6 +166,18 @@ function App() {
       );
     }
   }, [stageRef, setStageSize]);
+  function handleImageLoadError(e: React.SyntheticEvent) {
+    console.log('eeeeee');
+    setSetupState((state) => {
+      state.imageLoadError = e.toString();
+    });
+  }
+  function handleImageLoad(e: React.SyntheticEvent) {
+    console.log('done!');
+    setSetupState((state) => {
+      state.imageLoadError = undefined;
+    });
+  }
   function handleKeyPress(e: React.KeyboardEvent<any>) {
     if (e.key === ' ' && !e.repeat) {
       setControlState((state) => {
@@ -256,10 +269,7 @@ function App() {
     console.log(`selectedKPG: ${selectedKPG}`);
   }
   return (
-    <div
-      className="App"
-      style={{ cursor: imageLoading ? 'progress' : 'default' }}
-    >
+    <div className="App">
       <header className="App-header"></header>
       <main className="App-main">
         <div className="Tools">
@@ -303,7 +313,10 @@ function App() {
                 enablePan={panMode}
                 onClicked={handleViewportClicked}
               >
-                <ImageSprite />
+                {/* <ImageSprite /> */}
+                {imageRef.current ? (
+                  <Sprite image={imageRef.current} x={0} y={0} />
+                ) : null}
                 {keypointGraphList.map((_, gidx) => {
                   return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
                 })}
@@ -316,6 +329,15 @@ function App() {
               ? '[left click] to insert new keypoint; [right click] to pop out keypoint;'
               : '[left click] to select and drag keypoint;'}
           </div>
+          <img
+            ref={imageRef}
+            hidden={true}
+            src={imagePath}
+            alt="labeling rawdata"
+            crossOrigin=""
+            onError={handleImageLoadError}
+            onLoad={handleImageLoad}
+          />
           <div className="ErrorNote" hidden={!imageLoadError}>
             Image Load Error
           </div>
