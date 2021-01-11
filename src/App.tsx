@@ -230,8 +230,10 @@ function App() {
   //     ]
   //   )}`
   // );
-  console.log(`keypointGraphList.length: ${keypointGraphList.length}`);
-  console.log(`selectedKPG: ${selectedKPG}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`keypointGraphList.length: ${keypointGraphList.length}`);
+    console.log(`selectedKPG: ${selectedKPG}`);
+  }
   return (
     <div className="App">
       <header className="App-header"></header>
