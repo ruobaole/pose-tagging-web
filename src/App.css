@@ -83,3 +83,16 @@
   flex-direction: column;
   overflow: hidden;
 }
+
+.ControlTips {
+  position: absolute;
+  font-family: monospace;
+  font-size: x-small;
+  color: darkblue;
+  background-color: #a9a9a97a;
+  top: 1%;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  flex-direction: row;
+}

@@ -284,6 +284,12 @@ function App() {
               </Viewport>
             </Stage>
           </div>
+          <div className="ControlTips">
+            press [space] to pan;{' '}
+            {toolMode === 'i'
+              ? '[left click] to insert new keypoint; [right click] to pop out keypoint;'
+              : '[left click] to select and drag keypoint;'}
+          </div>
           <div className="LabelData" onWheel={handleLabelAreaWheel}>
             <LabelDataDisplay downloadContent={getDownloadContent()} />
           </div>
