@@ -11,33 +11,66 @@ import {
 import { KeypointPropertiesInput } from './InsertKPGTool';
 import './LabelDataDisplay.css';
 
+interface IDeleteKPGButtonProps {
+  enable: boolean;
+  onDelete?: () => void;
+}
+
+function DeleteKPGButton(props: IDeleteKPGButtonProps) {
+  const handleDelete = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.stopPropagation();
+    if (props.onDelete) {
+      props.onDelete();
+    }
+  };
+  return props.enable ? (
+    <Popover
+      content={
+        <Button type="primary" size="small" onClick={handleDelete}>
+          Confirm
+        </Button>
+      }
+      title={`Delete this graph?`}
+      trigger="click"
+    >
+      <DeleteTwoTone />
+    </Popover>
+  ) : (
+    <DeleteTwoTone twoToneColor="gray" />
+  );
+}
+
 interface IRenderKPGRowProps {
-  kgbIdx: number;
+  kpgIdx: number;
 }
 
 function RenderKPGRow(props: IRenderKPGRowProps) {
   const pointsSelector = (state: LabelState) =>
-    Object.keys(state.keypointGraphList[props.kgbIdx]);
+    Object.keys(state.keypointGraphList[props.kpgIdx]);
+  const kpgsSelector = (state: LabelState) =>
+    Object.keys(state.keypointGraphList);
   const pointList = useLabelStore(pointsSelector, shallow);
+  const kpgKeyList = useLabelStore(kpgsSelector, shallow);
+  const { setLabelState } = useLabelStore(labelSelector);
   const handleDelete = () => {
-    console.log(`delete: ${props.kgbIdx}`);
+    console.log(`DELETE kpg #${props.kpgIdx}`);
+    setLabelState((state) => {
+      state.selectedKPG = 0;
+      state.selectedKP = undefined;
+      state.keypointGraphList = state.keypointGraphList.filter(
+        (kpg, idx) => idx !== props.kpgIdx
+      );
+    });
   };
   return (
     <>
-      <span key="name">{`Keypoint Graph #${props.kgbIdx}`}</span>
+      <span key="name">{`Keypoint Graph #${props.kpgIdx}`}</span>
       <span key="length">{`${pointList.length} points`}</span>
       <span>
-        <Popover
-          content={
-            <Button type="primary" size="small" onClick={handleDelete}>
-              Confirm
-            </Button>
-          }
-          title={`Delete this graph?`}
-          trigger="click"
-        >
-          <DeleteTwoTone />
-        </Popover>
+        <DeleteKPGButton
+          enable={kpgKeyList.length > 1}
+          onDelete={handleDelete}
+        />
       </span>
     </>
   );
@@ -57,6 +90,7 @@ function KeypointGraphList() {
     <>
       {kpgList.map((kpgKey) => {
         const handleRowClick = (e: React.MouseEvent<HTMLDivElement>) => {
+          console.log('ccccccccc： ' + kpgKey);
           setLabelState((state) => {
             state.selectedKPG = +kpgKey;
             state.selectedKP = undefined;
@@ -69,7 +103,7 @@ function KeypointGraphList() {
             key={`${kpgKey}`}
             onClick={handleRowClick}
           >
-            <RenderKPGRow kgbIdx={+kpgKey} />
+            <RenderKPGRow kpgIdx={+kpgKey} />
           </div>
         );
       })}

@@ -224,6 +224,8 @@ function App() {
   //     ]
   //   )}`
   // );
+  console.log(`keypointGraphList.length: ${keypointGraphList.length}`);
+  console.log(`selectedKPG: ${selectedKPG}`);
   return (
     <div className="App">
       <header className="App-header"></header>

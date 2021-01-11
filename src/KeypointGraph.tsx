@@ -23,6 +23,9 @@ export function KeypointGraph(props: IKeypointGraphProps) {
     labelSelector
   );
   const { panMode, toolMode } = useControlStore(controlSelector);
+  if (!kpg) {
+    return null;
+  }
   return (
     <>
       {kpg.map((kp, ikp) => {
