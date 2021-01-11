@@ -57,9 +57,7 @@ function RenderKPGRow(props: IRenderKPGRowProps) {
     setLabelState((state) => {
       state.selectedKPG = 0;
       state.selectedKP = undefined;
-      state.keypointGraphList = state.keypointGraphList.filter(
-        (kpg, idx) => idx !== props.kpgIdx
-      );
+      state.keypointGraphList.splice(props.kpgIdx, 1);
     });
   };
   return (
