@@ -3,6 +3,29 @@ import { Button, Input } from 'antd';
 import { useSetupStore, setupSelector } from './App';
 import './Footer.css';
 
+function LabelingConfigUploader() {
+  const handleFileLoad = (e: ProgressEvent<FileReader>) => {
+    if (e.target && e.target.result) {
+      console.log('e.target.result: ', JSON.parse(e.target.result.toString()));
+    }
+  };
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const fileReader = new FileReader();
+      fileReader.readAsText(e.target.files[0], 'UTF-8');
+      fileReader.onload = handleFileLoad;
+    }
+  };
+  return (
+    <input
+      type="file"
+      accept="application/JSON"
+      onChange={handleChange}
+      title="Upload Labeling Config"
+    />
+  );
+}
+
 export function Footer() {
   const { imagePath, setSetupState } = useSetupStore(setupSelector);
   const [imageURLInput, setImageURLInput] = useState<string | undefined>(
@@ -31,6 +54,7 @@ export function Footer() {
           Reload Image
         </Button>
       </div>
+      <LabelingConfigUploader />
     </div>
   );
 }
