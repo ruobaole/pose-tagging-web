@@ -210,6 +210,12 @@ function App() {
       }
     }
   }
+  function getDownloadContent() {
+    return {
+      configVersion: (labelingConfig as any)['configVersion'],
+      keypointGraphList: keypointGraphList,
+    };
+  }
   // console.log(`PAN: ${panMode}`);
   // console.log(JSON.stringify(keypointGraphList));
   // console.log(
@@ -279,7 +285,7 @@ function App() {
             </Stage>
           </div>
           <div className="LabelData" onWheel={handleLabelAreaWheel}>
-            <LabelDataDisplay />
+            <LabelDataDisplay downloadContent={getDownloadContent()} />
           </div>
         </div>
       </main>

@@ -31,3 +31,10 @@
   background-color: #ff7875;
   /* color: darkblue; */
 }
+
+.LabelDataTitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding-right: 0.3em;
+}

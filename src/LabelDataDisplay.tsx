@@ -1,6 +1,6 @@
 import shallow from 'zustand/shallow';
 import { Button, Collapse, InputNumber, Popover } from 'antd';
-import { DeleteTwoTone } from '@ant-design/icons';
+import { DeleteTwoTone, DownloadOutlined } from '@ant-design/icons';
 import {
   KPGMold,
   useLabelStore,
@@ -224,10 +224,23 @@ function KeypointGraphDetail() {
   );
 }
 
-export function LabelDataDisplay() {
+interface ILabelDataDisplayProps {
+  downloadContent: {};
+}
+
+export function LabelDataDisplay(props: ILabelDataDisplayProps) {
+  // const { keypointGraphList } = useLabelStore(labelSelector);
+  // const downloadData = { keypointGraphList: keypointGraphList };
+  const downloadData =
+    'text/json;charset=utf-8,' +
+    encodeURIComponent(JSON.stringify(props.downloadContent));
   return (
     <>
-      Label Data
+      <div key="title" className="LabelDataTitle">
+        <a href={`data:${downloadData}`} download={`label.json`}>
+          <DownloadOutlined />
+        </a>
+      </div>
       <div key="KeypointGraphList" className="ItemList">
         <div>Item List:</div>
         <KeypointGraphList />
