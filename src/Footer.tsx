@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import isElectron from 'is-electron';
 import { Button, Input, Select } from 'antd';
+import { UpOutlined, DownOutlined, SaveOutlined } from '@ant-design/icons';
 import path from 'path';
 import {
   useSetupStore,
@@ -118,7 +119,7 @@ function ElectronConfigFileUpload() {
   });
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <Button size="small" type="primary" onClick={handleUploadClick}>
+      <Button size="small" type="default" onClick={handleUploadClick}>
         Upload Config
       </Button>
       <span style={{ marginLeft: '1em' }}>
@@ -160,9 +161,31 @@ function ElectronDirSelector() {
       state.imagePath = value;
     });
   };
+  const handleUpClick = () => {
+    if (imagePath && imgPathList && imgPathList.length > 0) {
+      const idx = imgPathList.indexOf(imagePath);
+      console.log(idx);
+      if (idx > 0) {
+        setSetupState((state) => {
+          state.imagePath = imgPathList[idx - 1];
+        });
+      }
+    }
+  };
+  const handleDownClick = () => {
+    if (imagePath && imgPathList && imgPathList.length > 0) {
+      const idx = imgPathList.indexOf(imagePath);
+      console.log(idx);
+      if (idx !== -1 && idx < imgPathList.length - 1) {
+        setSetupState((state) => {
+          state.imagePath = imgPathList[idx + 1];
+        });
+      }
+    }
+  };
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <Button size="small" type="primary" onClick={handleOpenDirClick}>
+      <Button size="small" type="default" onClick={handleOpenDirClick}>
         Open Workspace
       </Button>
       <span style={{ marginLeft: '1em', width: 180 }}>
@@ -194,7 +217,7 @@ function ElectronDirSelector() {
               .localeCompare(optionB.value.toLowerCase());
           }}
         >
-          {imgPathList.map((imgPath) => {
+          {imgPathList.map((imgPath, idx) => {
             return (
               <Select.Option key={imgPath} value={imgPath}>
                 {path.basename(imgPath)}
@@ -202,6 +225,18 @@ function ElectronDirSelector() {
             );
           })}
         </Select>
+      </span>
+      <span style={{ marginLeft: '1em', fontSize: '1.2em' }}>
+        <UpOutlined
+          style={{ marginRight: '1em', cursor: 'pointer' }}
+          onClick={handleUpClick}
+        />
+        <DownOutlined style={{ cursor: 'pointer' }} onClick={handleDownClick} />
+      </span>
+      <span style={{ marginLeft: '1em', fontSize: '1.2em' }}>
+        <Button type="primary" size="small">
+          <SaveOutlined style={{ cursor: 'pointer' }} />
+        </Button>
       </span>
     </div>
   );

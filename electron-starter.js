@@ -116,7 +116,6 @@ ipcMain.on('open-workspace', async (event) => {
       const imgURLs = imgList.map((imgp) => {
         return 'safe-file-protocol://' + imgp;
       });
-      console.log(imgURLs);
       event.sender.send('selected-workspace', {
         workspacePath: filePaths[0],
         imgList: imgURLs,
