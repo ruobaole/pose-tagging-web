@@ -68,7 +68,7 @@ export type SetupState = {
     keypointGraph: any[];
   };
   labelingConfigError?: string;
-  imagePath: string;
+  imagePath?: string;
   imageLoading: boolean;
   imageLoadError?: string;
   stageSize: [number, number]; // width, height
@@ -77,7 +77,6 @@ export type SetupState = {
 };
 export const useSetupStore = create<SetupState>((set) => ({
   labelingConfig: exampleConfig,
-  imagePath: exampleImage,
   // imagePath: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/coin.png',
   // imagePath:
   //   'https://github.com/ruobaole/pose-tagging-web/blob/master/src/example_data/simple002.jpeg',
@@ -181,7 +180,7 @@ function App() {
     });
   }
   function handleImageLoad(e: React.SyntheticEvent) {
-    console.log('done!');
+    console.log('done!' + ` ${imagePath}`);
     setSetupState((state) => {
       state.imageLoadError = undefined;
     });
@@ -328,8 +327,8 @@ function App() {
                 onClicked={handleViewportClicked}
               >
                 {/* <ImageSprite /> */}
-                {imageRef.current ? (
-                  <Sprite image={imageRef.current} x={0} y={0} />
+                {imagePath && imageRef.current ? (
+                  <Sprite image={imagePath} x={0} y={0} />
                 ) : null}
                 {keypointGraphList.map((_, gidx) => {
                   return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
@@ -343,15 +342,17 @@ function App() {
               ? '[left click] to insert new keypoint; [right click] to pop out keypoint;'
               : '[left click] to select and drag keypoint;'}
           </div>
-          <img
-            ref={imageRef}
-            hidden={true}
-            src={imagePath}
-            alt="labeling rawdata"
-            crossOrigin=""
-            onError={handleImageLoadError}
-            onLoad={handleImageLoad}
-          />
+          {imagePath ? (
+            <img
+              ref={imageRef}
+              hidden={true}
+              src={imagePath ? imagePath : ''}
+              alt="labeling rawdata"
+              crossOrigin=""
+              onError={handleImageLoadError}
+              onLoad={handleImageLoad}
+            />
+          ) : null}
           <div className="ErrorNote" hidden={!imageLoadError}>
             Image Load Error
           </div>

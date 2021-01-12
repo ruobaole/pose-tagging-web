@@ -1,14 +1,27 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, protocol } = require('electron');
 const url = require('url');
 const path = require('path');
 const fs = require('fs').promises;
+const fg = require('fast-glob');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 function createWindow() {
+  // create protocol
+  const protocolName = 'safe-file-protocol';
+  protocol.registerFileProtocol(protocolName, (request, callback) => {
+    const url = request.url.replace(`${protocolName}://`, '');
+    try {
+      return callback(decodeURIComponent(url));
+    } catch (error) {
+      // Handle the error as needed
+      console.error(error);
+    }
+  });
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     webPreferences: {
@@ -87,5 +100,30 @@ ipcMain.on('open-upload-config', async (event) => {
   } catch (error) {
     console.error(error);
     event.sender.send('load-config-error', error);
+  }
+});
+
+ipcMain.on('open-workspace', async (event) => {
+  try {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Select workspace',
+      properties: ['openDirectory'],
+    });
+    if (!canceled && filePaths.length > 0) {
+      const imgList = await fg([
+        `${filePaths[0]}/*.{jpg,JPG,png,PNG,jpeg,JPEG,bmp,BMP}`,
+      ]);
+      const imgURLs = imgList.map((imgp) => {
+        return 'safe-file-protocol://' + imgp;
+      });
+      console.log(imgURLs);
+      event.sender.send('selected-workspace', {
+        workspacePath: filePaths[0],
+        imgList: imgURLs,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    event.sender.send('select-workspace-error', error);
   }
 });

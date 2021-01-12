@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import isElectron from 'is-electron';
-import { Button, Input } from 'antd';
+import { Button, Input, Select } from 'antd';
+import path from 'path';
 import {
   useSetupStore,
   setupSelector,
@@ -12,7 +13,7 @@ import {
 } from './App';
 import './Footer.css';
 
-const electron = window.require('electron');
+const electron = isElectron() ? window.require('electron') : undefined;
 
 function LabelingConfigUploader() {
   const handleFileLoad = (e: ProgressEvent<FileReader>) => {
@@ -129,15 +130,89 @@ function ElectronConfigFileUpload() {
   );
 }
 
-export function ElectronFooter() {
-  const { imagePath } = useSetupStore(setupSelector);
-  const [imageURLInput, setImageURLInput] = useState<string | undefined>(
-    imagePath
+function ElectronDirSelector() {
+  const { imagePath, setSetupState } = useSetupStore(setupSelector);
+  const [workspacePath, setWorkspacePath] = useState<string | undefined>(
+    undefined
   );
+  const [imgPathList, setImgPathList] = useState<string[]>([]);
+  const handleOpenDirClick = () => {
+    electron.ipcRenderer.send('open-workspace');
+  };
+  electron.ipcRenderer.on(
+    'selected-workspace',
+    (event: any, workspaceInfo: any) => {
+      if (workspaceInfo.workspacePath) {
+        setWorkspacePath(workspaceInfo.workspacePath);
+      }
+      if (workspaceInfo.imgList) {
+        setImgPathList(workspaceInfo.imgList);
+        if (workspaceInfo.imgList.length > 0) {
+          setSetupState((state) => {
+            state.imagePath = workspaceInfo.imgList[0];
+          });
+        }
+      }
+    }
+  );
+  const handleSelect = (value: string) => {
+    setSetupState((state) => {
+      state.imagePath = value;
+    });
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <Button size="small" type="primary" onClick={handleOpenDirClick}>
+        Open Workspace
+      </Button>
+      <span style={{ marginLeft: '1em', width: 180 }}>
+        {workspacePath
+          ? `${path.basename(workspacePath)}/`
+          : 'workspace not selected'}
+      </span>
+      <span style={{ marginLeft: '1em' }}>
+        <Select
+          // showSearch
+          size="small"
+          style={{ width: 300 }}
+          placeholder="Select image"
+          optionFilterProp="children"
+          value={imagePath}
+          onSelect={handleSelect}
+          // filterOption={(input, option) => {
+          //   return (
+          //     option !== undefined &&
+          //     option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          //   );
+          // }}
+          filterSort={(optionA, optionB) => {
+            if (optionA === undefined || optionB === undefined) {
+              return false;
+            }
+            return optionA.value
+              .toLowerCase()
+              .localeCompare(optionB.value.toLowerCase());
+          }}
+        >
+          {imgPathList.map((imgPath) => {
+            return (
+              <Select.Option key={imgPath} value={imgPath}>
+                {path.basename(imgPath)}
+              </Select.Option>
+            );
+          })}
+        </Select>
+      </span>
+    </div>
+  );
+}
+
+export function ElectronFooter() {
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'row' }}></div>
       <ElectronConfigFileUpload />
+      <ElectronDirSelector />
     </>
   );
 }
