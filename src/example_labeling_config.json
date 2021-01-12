@@ -1,5 +1,5 @@
 {
-  "configVersion": "pose0.1",
+  "configVersion": "example_pose",
   "keypointGraph": [
     {
       "name": "nose",

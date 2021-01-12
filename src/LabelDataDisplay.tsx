@@ -2,11 +2,12 @@ import shallow from 'zustand/shallow';
 import { Button, Collapse, InputNumber, Popover } from 'antd';
 import { DeleteTwoTone, DownloadOutlined } from '@ant-design/icons';
 import {
-  KPGMold,
   useLabelStore,
   labelSelector,
   PropertyValueType,
   LabelState,
+  useSetupStore,
+  setupSelector,
 } from './App';
 import { KeypointPropertiesInput } from './InsertKPGTool';
 import './LabelDataDisplay.css';
@@ -160,6 +161,7 @@ function KeypointGraphDetail() {
     selectedKP,
     setLabelState,
   } = useLabelStore(labelSelector);
+  const { labelingConfig } = useSetupStore(setupSelector);
   const kpg = keypointGraphList[selectedKPG];
   function handleCollapseChange(panelKey: string | string[]) {
     let idx: number | undefined = undefined;
@@ -203,7 +205,7 @@ function KeypointGraphDetail() {
         return (
           <Collapse.Panel
             style={{ fontSize: 'small' }}
-            header={`keypoint #${idx} - ${kp.name}`}
+            header={`keypoint #${idx} - ${labelingConfig.keypointGraph[idx].displayText}`}
             key={idx}
           >
             <PostionInput
@@ -213,7 +215,7 @@ function KeypointGraphDetail() {
               onYChange={handleYChange}
             />
             <KeypointPropertiesInput
-              configProperties={KPGMold[idx].properties}
+              configProperties={labelingConfig.keypointGraph[idx].properties}
               valProperties={kp.properties}
               onChange={handlePropsChange}
             />

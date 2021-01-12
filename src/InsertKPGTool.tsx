@@ -1,14 +1,14 @@
 import { Checkbox, Button } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import {
-  KPGMold,
   useLabelStore,
   labelSelector,
-  kpLen,
   getKPDefaultProps,
   IConfigProperty,
   IProperties,
   PropertyValueType,
+  useSetupStore,
+  setupSelector,
 } from './App';
 
 interface IKeypointPropertiesInputProps {
@@ -63,6 +63,7 @@ interface IInsertKPGToolProps {
 
 export const InsertKPGTool = (props: IInsertKPGToolProps) => {
   const { nextProps, setLabelState } = useLabelStore(labelSelector);
+  const { labelingConfig } = useSetupStore(setupSelector);
   const handlePropChange = (propKey: string, newVal: PropertyValueType) => {
     setLabelState((state) => {
       state.nextProps[propKey].value = newVal;
@@ -74,10 +75,11 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
         // last graph -> add one
         state.selectedKPG = state.keypointGraphList.length;
         state.keypointGraphList.push([]);
-        state.nextProps = getKPDefaultProps(0);
+        state.nextProps = getKPDefaultProps(labelingConfig.keypointGraph, 0);
       } else {
         //not last graph -> to next one
         state.nextProps = getKPDefaultProps(
+          labelingConfig.keypointGraph,
           state.keypointGraphList[state.selectedKPG + 1].length
         );
         state.selectedKPG += 1;
@@ -91,7 +93,7 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
         Next Point
       </div>
       <div key="input-area" style={{ fontSize: 'small' }}>
-        {KPGMold.map((kp: any, idx) => {
+        {labelingConfig.keypointGraph.map((kp: any, idx) => {
           return (
             <>
               <span
@@ -102,7 +104,7 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
                     : {}
                 }
               >
-                {kp.name}
+                {kp.displayText}
               </span>
               <span
                 key={`keypoint-hint-arrow-${idx}`}
@@ -114,7 +116,7 @@ export const InsertKPGTool = (props: IInsertKPGToolProps) => {
         <Button
           size="small"
           type="primary"
-          disabled={props.nextPointIdx !== kpLen}
+          disabled={props.nextPointIdx !== labelingConfig.keypointGraph.length}
           onClick={handleNextGraph}
         >
           NEXT GRAPH

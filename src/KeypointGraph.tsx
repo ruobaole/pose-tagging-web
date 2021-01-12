@@ -3,10 +3,11 @@ import { Keypoint } from './Keypoint';
 import { Edge } from './Edge';
 import {
   useControlStore,
-  KPGMold,
   controlSelector,
   useLabelStore,
   labelSelector,
+  useSetupStore,
+  setupSelector,
 } from './App';
 
 interface IKeypointGraphProps {
@@ -23,6 +24,7 @@ export function KeypointGraph(props: IKeypointGraphProps) {
     labelSelector
   );
   const { panMode, toolMode } = useControlStore(controlSelector);
+  const { labelingConfig } = useSetupStore(setupSelector);
   if (!kpg) {
     return null;
   }
@@ -46,9 +48,9 @@ export function KeypointGraph(props: IKeypointGraphProps) {
         return (
           <>
             <Keypoint
+              key={`kp-g${props.graphIdx}-${ikp}`}
               interative={toolMode === 'e'}
               highlight={selectedKPG === props.graphIdx && selectedKP === ikp}
-              key={`kp-g${props.graphIdx}-${ikp}`}
               x={kp.x}
               y={kp.y}
               color={kp.properties['is_visible'].value ? 0xff00ff : 0x84f542} // tmp: hard coded
@@ -56,23 +58,25 @@ export function KeypointGraph(props: IKeypointGraphProps) {
               onPointerDown={handleKeypointClicked}
               onDragEnd={handleKeypointMoved}
             />
-            {KPGMold[ikp].neighbors.map((idxn: number, i: number) => {
-              if (idxn < ikp) {
-                return (
-                  <Edge
-                    key={`edge-g${props.graphIdx}-p${ikp}-to-p${idxn}`}
-                    x1={kp.x}
-                    y1={kp.y}
-                    x2={kpg[idxn].x}
-                    y2={kpg[idxn].y}
-                    color={+KPGMold[ikp].edgeColors[i]}
-                    alpha={1}
-                  />
-                );
-              } else {
-                return null;
+            {labelingConfig.keypointGraph[ikp].neighbors.map(
+              (idxn: number, i: number) => {
+                if (idxn < ikp) {
+                  return (
+                    <Edge
+                      key={`edge-g${props.graphIdx}-p${ikp}-to-p${idxn}`}
+                      x1={kp.x}
+                      y1={kp.y}
+                      x2={kpg[idxn].x}
+                      y2={kpg[idxn].y}
+                      color={+labelingConfig.keypointGraph[ikp].edgeColors[i]}
+                      alpha={1}
+                    />
+                  );
+                } else {
+                  return null;
+                }
               }
-            })}
+            )}
           </>
         );
       })}

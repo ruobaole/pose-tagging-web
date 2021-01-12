@@ -14,11 +14,8 @@ import { Footer } from './Footer';
 import { LabelDataDisplay } from './LabelDataDisplay';
 import { ClickEventData } from 'pixi-viewport';
 import exampleImage from './example_data/simple002.jpeg';
-import labelingConfig from './labeling_config.json';
+import exampleConfig from './example_labeling_config.json';
 
-export { labelingConfig };
-export const KPGMold = labelingConfig.keypointGraph;
-export const kpLen = labelingConfig.keypointGraph.length;
 export type PropertyValueType = string | number | boolean | undefined;
 export interface IConfigPropertyObject {
   type: string;
@@ -38,14 +35,15 @@ export interface IProperties {
   };
 }
 
-export function getKPDefaultProps(idx0: number) {
+export function getKPDefaultProps(keypointGraphConfig: any[], idx0: number) {
+  const kpLen = keypointGraphConfig.length;
   let idx = idx0 >= 0 ? idx0 % kpLen : kpLen - ((-1 * idx0) % kpLen);
   const defaultProps: IProperties = {};
-  Object.keys(KPGMold[idx].properties).forEach((propName) => {
+  Object.keys(keypointGraphConfig[idx].properties).forEach((propName) => {
     defaultProps[propName] = {
-      type: (KPGMold[idx].properties as any)[propName].type,
-      title: (KPGMold[idx].properties as any)[propName].title,
-      value: (KPGMold[idx].properties as any)[propName].default,
+      type: (keypointGraphConfig[idx].properties as any)[propName].type,
+      title: (keypointGraphConfig[idx].properties as any)[propName].title,
+      value: (keypointGraphConfig[idx].properties as any)[propName].default,
     };
   });
   return defaultProps;
@@ -64,15 +62,21 @@ function copyProps(props0: IProperties) {
 }
 
 // store states
-type SetupState = {
+export type SetupState = {
+  labelingConfig: {
+    configVersion: string;
+    keypointGraph: any[];
+  };
+  labelingConfigError?: string;
   imagePath: string;
   imageLoading: boolean;
   imageLoadError?: string;
   stageSize: [number, number]; // width, height
   setStageSize: (w: number, h: number) => void;
-  set: (fn: (state: SetupState) => void) => void;
+  setSetupState: (fn: (state: SetupState) => void) => void;
 };
 export const useSetupStore = create<SetupState>((set) => ({
+  labelingConfig: exampleConfig,
   imagePath: exampleImage,
   // imagePath: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/coin.png',
   // imagePath:
@@ -80,16 +84,18 @@ export const useSetupStore = create<SetupState>((set) => ({
   // imagePath: 'https://via.placeholder.com/1080',
   imageLoading: false,
   stageSize: [256, 256],
-  set: (fn) => set(produce(fn)),
+  setSetupState: (fn) => set(produce(fn)),
   setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
 }));
 export const setupSelector = (state: SetupState) => ({
+  labelingConfig: state.labelingConfig,
+  labelingConfigError: state.labelingConfigError,
   imagePath: state.imagePath,
   stageSize: state.stageSize,
   imageLoading: state.imageLoading,
   imageLoadError: state.imageLoadError,
   setStageSize: state.setStageSize,
-  setSetupState: state.set,
+  setSetupState: state.setSetupState,
 });
 
 export type ToolModeType = 'i' | 'e';
@@ -124,7 +130,7 @@ export type LabelState = {
 export const useLabelStore = create<LabelState>((set) => ({
   keypointGraphList: [[]],
   selectedKPG: 0,
-  nextProps: getKPDefaultProps(0),
+  nextProps: getKPDefaultProps(exampleConfig.keypointGraph, 0),
   set: (fn) => set(produce(fn)),
 }));
 export const labelSelector = (state: LabelState) => ({
@@ -141,6 +147,8 @@ if (process.env.NODE_ENV === 'development') {
 
 function App() {
   const {
+    labelingConfig,
+    labelingConfigError,
     imagePath,
     imageLoadError,
     stageSize,
@@ -209,20 +217,26 @@ function App() {
         // left click
         console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
         // add keypoint
-        if (keypointGraphList[selectedKPG].length === kpLen) {
+        if (
+          keypointGraphList[selectedKPG].length ===
+          labelingConfig.keypointGraph.length
+        ) {
           console.log(`this keypoint graph is already FULL!`);
         } else {
           const nextPointIdx = keypointGraphList[selectedKPG].length;
           const newKP = {
-            name: KPGMold[nextPointIdx].name,
+            name: labelingConfig.keypointGraph[nextPointIdx].name,
             x: e.world.x,
             y: e.world.y,
             properties: nextProps,
           };
           setLabelState((state) => {
             state.keypointGraphList[selectedKPG].push(newKP);
-            if (nextPointIdx + 1 < kpLen) {
-              state.nextProps = getKPDefaultProps(nextPointIdx + 1);
+            if (nextPointIdx + 1 < labelingConfig.keypointGraph.length) {
+              state.nextProps = getKPDefaultProps(
+                labelingConfig.keypointGraph,
+                nextPointIdx + 1
+              );
             }
           });
         }

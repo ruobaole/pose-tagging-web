@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const url = require('url');
 const path = require('path');
+const fs = require('fs').promises;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -9,16 +10,24 @@ let mainWindow;
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 1200, height: 800 });
+  mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    width: 2000,
+    height: 800,
+  });
 
   // and load the index.html of the app.
-  const startUrl =
-    process.env.ELECTRON_START_URL ||
-    url.format({
-      pathname: path.join(__dirname, '/../build/index.html'),
-      protocol: 'file:',
-      slashes: true,
-    });
+  // const startUrl =
+  //   process.env.ELECTRON_START_URL ||
+  //   url.format({
+  //     pathname: path.join(__dirname, '/../build/index.html'),
+  //     protocol: 'file:',
+  //     slashes: true,
+  //   });
+  // tmp
+  const startUrl = 'http://localhost:3000/';
   mainWindow.loadURL(startUrl);
 
   // Open the DevTools.
@@ -57,3 +66,26 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.on('open-upload-config', async (event) => {
+  try {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Select labeling config file',
+      properties: ['openFile'],
+      filters: [
+        {
+          name: 'Config',
+          extensions: ['json', 'JSON'],
+        },
+      ],
+    });
+    if (!canceled && filePaths.length > 0) {
+      const buf = await fs.readFile(filePaths[0]);
+      const config = JSON.parse(String(buf));
+      event.sender.send('load-config', config);
+    }
+  } catch (error) {
+    console.error(error);
+    event.sender.send('load-config-error', error);
+  }
+});

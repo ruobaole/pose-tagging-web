@@ -1,7 +1,18 @@
 import { ChangeEvent, useState } from 'react';
+import isElectron from 'is-electron';
 import { Button, Input } from 'antd';
-import { useSetupStore, setupSelector } from './App';
+import {
+  useSetupStore,
+  setupSelector,
+  useLabelStore,
+  labelSelector,
+  getKPDefaultProps,
+  SetupState,
+  LabelState,
+} from './App';
 import './Footer.css';
+
+const electron = window.require('electron');
 
 function LabelingConfigUploader() {
   const handleFileLoad = (e: ProgressEvent<FileReader>) => {
@@ -26,7 +37,7 @@ function LabelingConfigUploader() {
   );
 }
 
-export function Footer() {
+export function WebFooter() {
   const { imagePath, setSetupState } = useSetupStore(setupSelector);
   const [imageURLInput, setImageURLInput] = useState<string | undefined>(
     imagePath
@@ -42,7 +53,7 @@ export function Footer() {
     }
   }
   return (
-    <div className="FooterWrapper">
+    <>
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <Input
           size="small"
@@ -55,6 +66,86 @@ export function Footer() {
         </Button>
       </div>
       <LabelingConfigUploader />
+    </>
+  );
+}
+
+function validateLabelingConfig(newConfig: any) {
+  if (
+    !newConfig['example_pose1'] ||
+    !newConfig['keypointGraph'] ||
+    newConfig['keypointGraph'].length < 1
+  ) {
+    return false;
+  }
+  return true;
+}
+
+export function loadLabelingConfig(
+  newConfig: any,
+  setSetupState: (fn: (state: SetupState) => void) => void,
+  setLabelState: (fn: (state: LabelState) => void) => void
+) {
+  if (!validateLabelingConfig(newConfig)) {
+    setSetupState((state) => {
+      state.labelingConfigError = 'labeling config invalid';
+    });
+    return;
+  }
+  setSetupState((state) => {
+    state.labelingConfigError = undefined;
+    state.labelingConfig = newConfig;
+  });
+  setLabelState((state) => {
+    state.selectedKPG = 0;
+    state.selectedKP = undefined;
+    state.keypointGraphList = [[]];
+    state.nextProps = getKPDefaultProps(newConfig['keypointGraph'], 0);
+  });
+}
+
+function ElectronConfigFileUpload() {
+  const { labelingConfig, labelingConfigError, setSetupState } = useSetupStore(
+    setupSelector
+  );
+  const { setLabelState } = useLabelStore(labelSelector);
+  const handleUploadClick = () => {
+    electron.ipcRenderer.send('open-upload-config');
+  };
+  electron.ipcRenderer.on('load-config', (event: any, configObject: any) => {
+    loadLabelingConfig(configObject, setSetupState, setLabelState);
+  });
+  return (
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <Button size="small" type="primary" onClick={handleUploadClick}>
+        Upload Config
+      </Button>
+      <span style={{ marginLeft: '1em' }}>
+        {labelingConfigError === undefined
+          ? `Config Version: ${labelingConfig.configVersion}`
+          : `Config Invalid!`}
+      </span>
+    </div>
+  );
+}
+
+export function ElectronFooter() {
+  const { imagePath } = useSetupStore(setupSelector);
+  const [imageURLInput, setImageURLInput] = useState<string | undefined>(
+    imagePath
+  );
+  return (
+    <>
+      <div style={{ display: 'flex', flexDirection: 'row' }}></div>
+      <ElectronConfigFileUpload />
+    </>
+  );
+}
+
+export function Footer() {
+  return (
+    <div className="FooterWrapper">
+      {isElectron() ? <ElectronFooter /> : <WebFooter />}
     </div>
   );
 }
