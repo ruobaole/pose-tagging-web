@@ -126,8 +126,13 @@ function ElectronConfigFileUpload() {
     electron.ipcRenderer.send('load-config');
   };
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <Button size="small" type="default" onClick={handleUploadClick}>
+    <div className="FooterRow">
+      <Button
+        style={{ width: 130 }}
+        size="small"
+        type="default"
+        onClick={handleUploadClick}
+      >
         Upload Config
       </Button>
       <span style={{ marginLeft: '1em' }}>
@@ -286,65 +291,80 @@ function ElectronWorkplaceControl() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <Button size="small" type="default" onClick={handleOpenDirClick}>
-        Open Workspace
-      </Button>
-      <span style={{ marginLeft: '1em', width: 180 }}>
-        {workspacePath
-          ? `${path.basename(workspacePath)}/`
-          : 'workspace not selected'}
-      </span>
-      <span style={{ marginLeft: '1em' }}>
-        <Select
-          // showSearch
+    <div className="FooterRow">
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <Button
           size="small"
-          style={{ width: 300 }}
-          placeholder="Select image"
-          optionFilterProp="children"
-          value={imagePath}
-          onSelect={handleSelect}
-          // filterOption={(input, option) => {
-          //   return (
-          //     option !== undefined &&
-          //     option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
-          //   );
-          // }}
-          filterSort={(optionA, optionB) => {
-            if (optionA === undefined || optionB === undefined) {
-              return false;
-            }
-            return optionA.value
-              .toLowerCase()
-              .localeCompare(optionB.value.toLowerCase());
-          }}
+          style={{ width: 130 }}
+          type="default"
+          onClick={handleOpenDirClick}
         >
-          {imgPathList.map((imgPath, idx) => {
-            return (
-              <Select.Option key={imgPath} value={imgPath}>
-                {path.basename(imgPath)}
-              </Select.Option>
-            );
-          })}
-        </Select>
-      </span>
+          Open Workspace
+        </Button>
+        <span style={{ marginLeft: '1em', width: 180, textAlign: 'end' }}>
+          {workspacePath
+            ? `${path.basename(workspacePath)}/`
+            : 'workspace not selected'}
+        </span>
+        <span style={{ marginLeft: '0.4em' }}>
+          <Select
+            // showSearch
+            size="small"
+            style={{ width: 300 }}
+            placeholder="Select image"
+            optionFilterProp="children"
+            value={imagePath}
+            onSelect={handleSelect}
+            // filterOption={(input, option) => {
+            //   return (
+            //     option !== undefined &&
+            //     option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            //   );
+            // }}
+            filterSort={(optionA, optionB) => {
+              if (optionA === undefined || optionB === undefined) {
+                return false;
+              }
+              return optionA.value
+                .toLowerCase()
+                .localeCompare(optionB.value.toLowerCase());
+            }}
+          >
+            {imgPathList.map((imgPath, idx) => {
+              return (
+                <Select.Option key={imgPath} value={imgPath}>
+                  {path.basename(imgPath)}
+                </Select.Option>
+              );
+            })}
+          </Select>
+        </span>
+        <span style={{ marginLeft: '1em', fontSize: '1.2em' }}>
+          <UpOutlined
+            style={{ marginRight: '1em', cursor: 'pointer' }}
+            onClick={handleUpClick}
+          />
+          <DownOutlined
+            style={{ cursor: 'pointer' }}
+            onClick={handleDownClick}
+          />
+        </span>
+        <span style={{ marginLeft: '1em' }}>
+          <span style={{ marginRight: '0.5em' }}>Auto Save:</span>
+          <Switch
+            size="small"
+            checked={autoSave}
+            onChange={handleSwitchAutoSave}
+          />
+        </span>
+      </div>
       <span style={{ marginLeft: '1em', fontSize: '1.2em' }}>
-        <UpOutlined
-          style={{ marginRight: '1em', cursor: 'pointer' }}
-          onClick={handleUpClick}
-        />
-        <DownOutlined style={{ cursor: 'pointer' }} onClick={handleDownClick} />
-      </span>
-      <span style={{ marginLeft: '1em' }}>
-        <span style={{ marginRight: '0.5em' }}>Auto Save:</span>
-        <Switch
+        <Button
+          style={{ width: 50 }}
+          type="primary"
           size="small"
-          checked={autoSave}
-          onChange={handleSwitchAutoSave}
-        />
-      </span>
-      <span style={{ marginLeft: '1em', fontSize: '1.2em' }}>
-        <Button type="primary" size="small" disabled={!imagePath}>
+          disabled={!imagePath}
+        >
           <SaveOutlined
             style={{ cursor: 'pointer' }}
             onClick={saveLabelingResult}
@@ -358,7 +378,6 @@ function ElectronWorkplaceControl() {
 export function ElectronFooter() {
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'row' }}></div>
       <ElectronConfigFileUpload />
       <ElectronWorkplaceControl />
     </>

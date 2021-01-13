@@ -2,4 +2,13 @@
   color: cornsilk;
   display: flex;
   flex-direction: column;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.FooterRow {
+  display: flex;
+  flex-direction: row;
+  margin-top: 0.3em;
+  justify-content: space-between;
 }
