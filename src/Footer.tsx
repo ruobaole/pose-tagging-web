@@ -1,6 +1,6 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
 import isElectron from 'is-electron';
-import { Button, Input, Select } from 'antd';
+import { Button, Input, Select, Switch } from 'antd';
 import { UpOutlined, DownOutlined, SaveOutlined } from '@ant-design/icons';
 import path from 'path';
 import {
@@ -12,6 +12,7 @@ import {
   SetupState,
   LabelState,
 } from './App';
+import { getLabelingResult, getLabelingResultPath } from './tools';
 import './Footer.css';
 
 const electron = isElectron() ? window.require('electron') : undefined;
@@ -111,12 +112,19 @@ function ElectronConfigFileUpload() {
     setupSelector
   );
   const { setLabelState } = useLabelStore(labelSelector);
-  const handleUploadClick = () => {
-    electron.ipcRenderer.send('open-upload-config');
-  };
-  electron.ipcRenderer.on('load-config', (event: any, configObject: any) => {
-    loadLabelingConfig(configObject, setSetupState, setLabelState);
+  useEffect(() => {
+    electron.ipcRenderer.once('load-config', handleConfigLoaded);
+    // Specify how to clean up after this effect:
+    return function cleanupListeners() {
+      electron.ipcRenderer.removeAllListeners('load-config');
+    };
   });
+  const handleConfigLoaded = (event: any, configObject: any) => {
+    loadLabelingConfig(configObject, setSetupState, setLabelState);
+  };
+  const handleUploadClick = () => {
+    electron.ipcRenderer.send('load-config');
+  };
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <Button size="small" type="default" onClick={handleUploadClick}>
@@ -131,58 +139,152 @@ function ElectronConfigFileUpload() {
   );
 }
 
-function ElectronDirSelector() {
-  const { imagePath, setSetupState } = useSetupStore(setupSelector);
+function ElectronWorkplaceControl() {
+  const {
+    imagePath,
+    imageLoadError,
+    labelingConfig,
+    labelingConfigError,
+    setSetupState,
+  } = useSetupStore(setupSelector);
+  const { keypointGraphList, setLabelState } = useLabelStore(labelSelector);
   const [workspacePath, setWorkspacePath] = useState<string | undefined>(
     undefined
   );
   const [imgPathList, setImgPathList] = useState<string[]>([]);
-  const handleOpenDirClick = () => {
-    electron.ipcRenderer.send('open-workspace');
-  };
-  electron.ipcRenderer.on(
-    'selected-workspace',
-    (event: any, workspaceInfo: any) => {
-      if (workspaceInfo.workspacePath) {
-        setWorkspacePath(workspaceInfo.workspacePath);
-      }
-      if (workspaceInfo.imgList) {
-        setImgPathList(workspaceInfo.imgList);
-        if (workspaceInfo.imgList.length > 0) {
-          setSetupState((state) => {
-            state.imagePath = workspaceInfo.imgList[0];
-          });
-        }
+  const [autoSave, setAutoSave] = useState<boolean>(false);
+  useEffect(() => {
+    electron.ipcRenderer.once('select-workspace', handleWorkplaceSelected);
+    electron.ipcRenderer.once('save-labeling-result', handleResultSaved);
+    electron.ipcRenderer.once('load-labeling-result', handleResultLoaded);
+    // Specify how to clean up after this effect:
+    return function cleanupListeners() {
+      electron.ipcRenderer.removeAllListeners('select-workspace');
+      electron.ipcRenderer.removeAllListeners('save-labeling-result');
+      electron.ipcRenderer.removeAllListeners('load-labeling-result');
+    };
+  });
+  const handleResultLoaded = (event: any, info: any) => {
+    const { isExist, labelingResult, success, error } = info;
+    if (!isExist) {
+      clearLabels();
+    } else {
+      const s = prepareLabels(labelingResult);
+      if (!s) {
+        clearLabels();
       }
     }
-  );
+  };
+  const handleWorkplaceSelected = (event: any, workspaceInfo: any) => {
+    if (workspaceInfo.workspacePath) {
+      setWorkspacePath(workspaceInfo.workspacePath);
+    }
+    if (workspaceInfo.imgList) {
+      setImgPathList(workspaceInfo.imgList);
+      if (workspaceInfo.imgList.length > 0) {
+        openNewImage(workspaceInfo.imgList[0], autoSave);
+      }
+    }
+  };
+  const handleResultSaved = (event: any, info: any) => {
+    const { labelingResultPath, success, error } = info;
+    const notification = {
+      title: 'Saved Successfully',
+      body: `Labeling result saved to ${labelingResultPath}`,
+    };
+    if (!success) {
+      notification.title = 'Save Error';
+      notification.body = error;
+    }
+    new window.Notification(notification.title, notification);
+  };
+  const handleOpenDirClick = () => {
+    electron.ipcRenderer.send('select-workspace');
+  };
   const handleSelect = (value: string) => {
-    setSetupState((state) => {
-      state.imagePath = value;
-    });
+    openNewImage(value, autoSave);
   };
   const handleUpClick = () => {
     if (imagePath && imgPathList && imgPathList.length > 0) {
       const idx = imgPathList.indexOf(imagePath);
-      console.log(idx);
       if (idx > 0) {
-        setSetupState((state) => {
-          state.imagePath = imgPathList[idx - 1];
-        });
+        openNewImage(imgPathList[idx - 1], autoSave);
       }
     }
   };
   const handleDownClick = () => {
     if (imagePath && imgPathList && imgPathList.length > 0) {
       const idx = imgPathList.indexOf(imagePath);
-      console.log(idx);
       if (idx !== -1 && idx < imgPathList.length - 1) {
-        setSetupState((state) => {
-          state.imagePath = imgPathList[idx + 1];
-        });
+        openNewImage(imgPathList[idx + 1], autoSave);
       }
     }
   };
+  const handleSwitchAutoSave = (checked: boolean) => {
+    setAutoSave(checked);
+  };
+
+  const prepareLabels = (labelingResult: any) => {
+    if (labelingResult['configVersion'] !== labelingConfig['configVersion']) {
+      console.log(
+        `labelingResult['configVersion'] !== labelingConfig['configVersion']`
+      );
+      return false;
+    }
+    if (
+      labelingResult['keypointGraphList'] &&
+      labelingResult['keypointGraphList'].length > 0
+    ) {
+      setLabelState((state) => {
+        state.keypointGraphList = labelingResult['keypointGraphList'];
+        state.selectedKPG = 0;
+        state.selectedKP = undefined;
+        state.nextProps = getKPDefaultProps(
+          labelingConfig['keypointGraph'],
+          labelingResult['keypointGraphList'].length
+        );
+      });
+      return true;
+    }
+    return false;
+  };
+  const clearLabels = () => {
+    setLabelState((state) => {
+      state.keypointGraphList = [[]];
+      state.selectedKPG = 0;
+      state.selectedKP = undefined;
+      state.nextProps = getKPDefaultProps(labelingConfig['keypointGraph'], 0);
+    });
+  };
+  const openNewImage = (newImagePath: string, saveCurrent: boolean) => {
+    console.log(saveCurrent);
+    if (saveCurrent) {
+      saveLabelingResult();
+    }
+    const newLabelingResultPath = getLabelingResultPath(newImagePath);
+    setSetupState((state) => {
+      state.imagePath = newImagePath;
+    });
+    electron.ipcRenderer.send('load-labeling-result', newLabelingResultPath);
+  };
+  const saveLabelingResult = () => {
+    if (!imagePath) {
+      return;
+    }
+    const labelingResult = getLabelingResult(
+      labelingConfig,
+      keypointGraphList,
+      labelingConfigError,
+      imagePath.replace(`safe-file-protocol://`, ''),
+      imageLoadError
+    );
+    const labelingResultPath = getLabelingResultPath(imagePath);
+    electron.ipcRenderer.send('save-labeling-result', {
+      labelingResultPath,
+      labelingResult,
+    });
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <Button size="small" type="default" onClick={handleOpenDirClick}>
@@ -233,9 +335,20 @@ function ElectronDirSelector() {
         />
         <DownOutlined style={{ cursor: 'pointer' }} onClick={handleDownClick} />
       </span>
+      <span style={{ marginLeft: '1em' }}>
+        <span style={{ marginRight: '0.5em' }}>Auto Save:</span>
+        <Switch
+          size="small"
+          checked={autoSave}
+          onChange={handleSwitchAutoSave}
+        />
+      </span>
       <span style={{ marginLeft: '1em', fontSize: '1.2em' }}>
-        <Button type="primary" size="small">
-          <SaveOutlined style={{ cursor: 'pointer' }} />
+        <Button type="primary" size="small" disabled={!imagePath}>
+          <SaveOutlined
+            style={{ cursor: 'pointer' }}
+            onClick={saveLabelingResult}
+          />
         </Button>
       </span>
     </div>
@@ -247,7 +360,7 @@ export function ElectronFooter() {
     <>
       <div style={{ display: 'flex', flexDirection: 'row' }}></div>
       <ElectronConfigFileUpload />
-      <ElectronDirSelector />
+      <ElectronWorkplaceControl />
     </>
   );
 }

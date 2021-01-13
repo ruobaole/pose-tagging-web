@@ -231,8 +231,6 @@ interface ILabelDataDisplayProps {
 }
 
 export function LabelDataDisplay(props: ILabelDataDisplayProps) {
-  // const { keypointGraphList } = useLabelStore(labelSelector);
-  // const downloadData = { keypointGraphList: keypointGraphList };
   const downloadData =
     'text/json;charset=utf-8,' +
     encodeURIComponent(JSON.stringify(props.downloadContent));

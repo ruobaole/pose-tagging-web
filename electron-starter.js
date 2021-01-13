@@ -8,12 +8,12 @@ const fg = require('fast-glob');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+const safeFileProtocol = 'safe-file-protocol';
 
 function createWindow() {
   // create protocol
-  const protocolName = 'safe-file-protocol';
-  protocol.registerFileProtocol(protocolName, (request, callback) => {
-    const url = request.url.replace(`${protocolName}://`, '');
+  protocol.registerFileProtocol(safeFileProtocol, (request, callback) => {
+    const url = request.url.replace(`${safeFileProtocol}://`, '');
     try {
       return callback(decodeURIComponent(url));
     } catch (error) {
@@ -80,7 +80,7 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('open-upload-config', async (event) => {
+ipcMain.on('load-config', async (event) => {
   try {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: 'Select labeling config file',
@@ -103,7 +103,7 @@ ipcMain.on('open-upload-config', async (event) => {
   }
 });
 
-ipcMain.on('open-workspace', async (event) => {
+ipcMain.on('select-workspace', async (event) => {
   try {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: 'Select workspace',
@@ -114,9 +114,9 @@ ipcMain.on('open-workspace', async (event) => {
         `${filePaths[0]}/*.{jpg,JPG,png,PNG,jpeg,JPEG,bmp,BMP}`,
       ]);
       const imgURLs = imgList.map((imgp) => {
-        return 'safe-file-protocol://' + imgp;
+        return `${safeFileProtocol}://` + imgp;
       });
-      event.sender.send('selected-workspace', {
+      event.sender.send('select-workspace', {
         workspacePath: filePaths[0],
         imgList: imgURLs,
       });
@@ -124,5 +124,57 @@ ipcMain.on('open-workspace', async (event) => {
   } catch (error) {
     console.error(error);
     event.sender.send('select-workspace-error', error);
+  }
+});
+
+ipcMain.on('save-labeling-result', async (event, labelingResultInfo) => {
+  try {
+    const { labelingResultPath, labelingResult } = labelingResultInfo;
+    const writeStr = JSON.stringify(labelingResult);
+    await fs.writeFile(
+      labelingResultPath.replace(`${safeFileProtocol}://`, ''),
+      writeStr
+    );
+    event.sender.send('save-labeling-result', {
+      labelingResultPath,
+      success: true,
+      error: undefined,
+    });
+  } catch (error) {
+    console.error(error);
+    event.sender.send('save-labeling-result', {
+      labelingResult,
+      success: false,
+      error,
+    });
+  }
+});
+
+ipcMain.on('load-labeling-result', async (event, labelingResultPath) => {
+  try {
+    const fpath = labelingResultPath.replace(`${safeFileProtocol}://`, '');
+    // const isExist = await fs.exists(fpath);
+    // if (!isExist) {
+    //   event.sender.send('load-labeling-result', {
+    //     isExist,
+    //     success: true,
+    //     error: undefined,
+    //   });
+    //   return;
+    // }
+    const buf = await fs.readFile(fpath);
+    const result = JSON.parse(String(buf));
+    event.sender.send('load-labeling-result', {
+      isExist: true,
+      labelingResult: result,
+      success: true,
+      error: undefined,
+    });
+  } catch (error) {
+    console.error(error);
+    event.sender.send('load-labeling-result', {
+      success: false,
+      error,
+    });
   }
 });

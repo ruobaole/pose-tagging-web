@@ -13,7 +13,8 @@ import { InsertKPGTool } from './InsertKPGTool';
 import { Footer } from './Footer';
 import { LabelDataDisplay } from './LabelDataDisplay';
 import { ClickEventData } from 'pixi-viewport';
-import exampleImage from './example_data/simple002.jpeg';
+import { getLabelingResult } from './tools';
+// import exampleImage from './example_data/simple002.jpeg';
 import exampleConfig from './example_labeling_config.json';
 
 export type PropertyValueType = string | number | boolean | undefined;
@@ -114,13 +115,14 @@ export const controlSelector = (state: ControlState) => ({
   setControlState: state.set,
 });
 
+export interface IKeypoint {
+  name: string;
+  x: number;
+  y: number;
+  properties: IProperties;
+}
 export type LabelState = {
-  keypointGraphList: {
-    name: string;
-    x: number;
-    y: number;
-    properties: IProperties;
-  }[][];
+  keypointGraphList: IKeypoint[][];
   nextProps: IProperties;
   selectedKPG: number;
   selectedKP?: number;
@@ -256,13 +258,6 @@ function App() {
       }
     }
   }
-  function getDownloadContent() {
-    return {
-      configVersion: (labelingConfig as any)['configVersion'],
-      imagePath: imagePath,
-      keypointGraphList: keypointGraphList,
-    };
-  }
   // console.log(`PAN: ${panMode}`);
   // console.log(JSON.stringify(keypointGraphList));
   // console.log(
@@ -357,7 +352,15 @@ function App() {
             Image Load Error
           </div>
           <div className="LabelData" onWheel={handleLabelAreaWheel}>
-            <LabelDataDisplay downloadContent={getDownloadContent()} />
+            <LabelDataDisplay
+              downloadContent={getLabelingResult(
+                labelingConfig,
+                keypointGraphList,
+                labelingConfigError,
+                imagePath,
+                imageLoadError
+              )}
+            />
           </div>
         </div>
       </main>
