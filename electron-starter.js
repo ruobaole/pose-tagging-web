@@ -27,24 +27,26 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
-    width: 2000,
-    height: 800,
+    width: 1400,
+    height: 900,
   });
 
   // and load the index.html of the app.
-  // const startUrl =
-  //   process.env.ELECTRON_START_URL ||
-  //   url.format({
-  //     pathname: path.join(__dirname, '/../build/index.html'),
-  //     protocol: 'file:',
-  //     slashes: true,
-  //   });
+  const startUrl =
+    process.env.ELECTRON_START_URL ||
+    url.format({
+      // pathname: path.join(__dirname, '/../build/index.html'),
+      // protocol: 'file:',
+      pathname: path.join(__dirname, 'build/index.html'),
+      protocol: 'safe-file-protocol:',
+      slashes: true,
+    });
   // tmp
-  const startUrl = 'http://localhost:3000/';
+  // const startUrl = 'http://localhost:3000/';
   mainWindow.loadURL(startUrl);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {

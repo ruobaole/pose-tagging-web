@@ -1,5 +1,8 @@
 {
   "name": "pose-tagging-web",
+  "productName": "posetag",
+  "homepage": "./",
+  "description": "A simple tool for labeling pose keypoints",
   "author": "daisy.pang",
   "version": "0.1.0",
   "private": true,
@@ -21,6 +24,19 @@
     "web-vitals": "^0.2.4",
     "zustand": "^3.2.0"
   },
+  "build": {
+    "appId": "com.electron.posetag",
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "build/icon.png"
+    }
+  },
   "main": "./electron-starter.js",
   "scripts": {
     "start": "react-scripts start",
@@ -30,7 +46,8 @@
     "serve": "serve -s build -l 4000",
     "desktop-start": "cross-env BROWSER=none nf start -p 3000",
     "electron": "electron .",
-    "electron-start": "node ./electron-wait-react"
+    "electron-start": "node ./electron-wait-react",
+    "pack-ubuntu": "electron-packager . posetag --overwrite --platform=linux --arch=x64 --icon=build/icon.png --prune=true --out=release-builds"
   },
   "eslintConfig": {
     "extends": [
@@ -54,6 +71,7 @@
     "@inlet/react-pixi": "^6.0.6",
     "cross-env": "^7.0.3",
     "electron": "^11.1.1",
+    "electron-builder": "^22.9.1",
     "fast-glob": "^3.2.4",
     "foreman": "^3.0.1",
     "is-electron": "^2.2.0",

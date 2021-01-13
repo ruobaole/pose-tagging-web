@@ -262,7 +262,6 @@ function ElectronWorkplaceControl() {
     });
   };
   const openNewImage = (newImagePath: string, saveCurrent: boolean) => {
-    console.log(saveCurrent);
     if (saveCurrent) {
       saveLabelingResult();
     }

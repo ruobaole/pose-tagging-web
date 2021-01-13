@@ -182,7 +182,6 @@ function App() {
     });
   }
   function handleImageLoad(e: React.SyntheticEvent) {
-    console.log('done!' + ` ${imagePath}`);
     setSetupState((state) => {
       state.imageLoadError = undefined;
     });
@@ -216,7 +215,7 @@ function App() {
     if (toolMode === 'i') {
       if (e.event.data.button === 0) {
         // left click
-        console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
+        // console.log(`[EVENT]leftmouse ${e.world.x}, ${e.world.y}`);
         // add keypoint
         if (
           keypointGraphList[selectedKPG].length ===
@@ -243,7 +242,7 @@ function App() {
         }
       } else if (e.event.data.button === 2) {
         // right click
-        console.log(`[EVENT]rightmouse ${e.world.x}, ${e.world.y}`);
+        // console.log(`[EVENT]rightmouse ${e.world.x}, ${e.world.y}`);
         // pop keypoint
         if (keypointGraphList[selectedKPG].length === 0) {
           console.log(`this keypoint graph is already EMPTY!`);
