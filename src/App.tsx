@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import create from 'zustand';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import produce from 'immer';
-import { HotKeys } from 'react-hotkeys';
+// import { HotKeys } from 'react-hotkeys';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
@@ -177,18 +177,18 @@ function App() {
     }
   }, [stageRef, setStageSize]);
 
-  const keyMap = {
-    TOGGLE_VISIBLE: 'v',
-    MODE_I: '1',
-    MODE_E: '2',
-    SAVE: ['s'],
-  };
-  const hotKeyHandlers = {
-    TOGGLE_VISIBLE: handleToggleVisible,
-    MODE_I: handleModeChangeToI,
-    MODE_E: handleModeChangeToE,
-    SAVE: handleSave,
-  };
+  // const keyMap = {
+  //   TOGGLE_VISIBLE: 'v',
+  //   MODE_I: '1',
+  //   MODE_E: '2',
+  //   SAVE: ['s'],
+  // };
+  // const hotKeyHandlers = {
+  //   TOGGLE_VISIBLE: handleToggleVisible,
+  //   MODE_I: handleModeChangeToI,
+  //   MODE_E: handleModeChangeToE,
+  //   SAVE: handleSave,
+  // };
 
   function handleToggleVisible() {
     console.log('handleToggleVisible');
@@ -230,6 +230,15 @@ function App() {
       setControlState((state) => {
         state.panMode = true;
       });
+    }
+    if (e.key === 'v') {
+      handleToggleVisible();
+    }
+    if (e.key === '1') {
+      handleModeChangeToI();
+    }
+    if (e.key === '2') {
+      handleModeChangeToE();
     }
   }
   function handleKeyUp(e: React.KeyboardEvent<any>) {
@@ -340,8 +349,8 @@ function App() {
           </div>
         </div>
         <div className="StageArea" ref={stageRef}>
-          <HotKeys keyMap={keyMap} handlers={hotKeyHandlers} className="Stage">
-            {/* <div className="Stage"> */}
+          {/* <HotKeys keyMap={keyMap} handlers={hotKeyHandlers} className="Stage"> */}
+          <div className="Stage">
             <Stage
               width={stageSize[0]}
               height={stageSize[1]}
@@ -369,8 +378,8 @@ function App() {
                 })}
               </Viewport>
             </Stage>
-            {/* </div> */}
-          </HotKeys>
+          </div>
+          {/* </HotKeys> */}
           <div className="ControlTips">
             press [space] to pan;{' '}
             {toolMode === 'i'
