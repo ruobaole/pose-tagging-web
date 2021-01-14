@@ -74,6 +74,7 @@ export type SetupState = {
   imageLoading: boolean;
   imageLoadError?: string;
   stageSize: [number, number]; // width, height
+  keypointRadius: number;
   setStageSize: (w: number, h: number) => void;
   setSetupState: (fn: (state: SetupState) => void) => void;
 };
@@ -85,6 +86,7 @@ export const useSetupStore = create<SetupState>((set) => ({
   // imagePath: 'https://via.placeholder.com/1080',
   imageLoading: false,
   stageSize: [256, 256],
+  keypointRadius: 4,
   setSetupState: (fn) => set(produce(fn)),
   setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
 }));
@@ -95,6 +97,7 @@ export const setupSelector = (state: SetupState) => ({
   stageSize: state.stageSize,
   imageLoading: state.imageLoading,
   imageLoadError: state.imageLoadError,
+  keypointRadius: state.keypointRadius,
   setStageSize: state.setStageSize,
   setSetupState: state.setSetupState,
 });
@@ -221,9 +224,21 @@ function App() {
     });
   }
   function handleImageLoad(e: React.SyntheticEvent) {
+    console.log(
+      `w:${imageRef.current?.naturalWidth} - h:${imageRef.current?.naturalHeight}`
+    );
     setSetupState((state) => {
       state.imageLoadError = undefined;
     });
+    if (imageRef.current?.naturalWidth && imageRef.current?.naturalHeight) {
+      const dim: number =
+        imageRef.current.naturalWidth > imageRef.current.naturalHeight
+          ? imageRef.current.naturalWidth
+          : imageRef.current.naturalHeight;
+      setSetupState((state) => {
+        state.keypointRadius = dim / 400.0;
+      });
+    }
   }
   function handleKeyPress(e: React.KeyboardEvent<any>) {
     if (e.key === ' ' && !e.repeat) {

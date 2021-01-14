@@ -24,7 +24,7 @@ export function KeypointGraph(props: IKeypointGraphProps) {
     labelSelector
   );
   const { panMode, toolMode } = useControlStore(controlSelector);
-  const { labelingConfig } = useSetupStore(setupSelector);
+  const { labelingConfig, keypointRadius } = useSetupStore(setupSelector);
   if (!kpg) {
     return null;
   }
@@ -54,7 +54,7 @@ export function KeypointGraph(props: IKeypointGraphProps) {
               x={kp.x}
               y={kp.y}
               color={kp.properties['is_visible'].value ? 0xff00ff : 0x84f542} // tmp: hard coded
-              radius={4}
+              radius={keypointRadius}
               onPointerDown={handleKeypointClicked}
               onDragEnd={handleKeypointMoved}
             />
