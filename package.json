@@ -7,7 +7,7 @@
     "name": "daisy.pang",
     "email": "daisyrpanglive@live.com"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -60,8 +60,8 @@
     "electron": "electron .",
     "electron-dev": "cross-env ELECTRON_START_URL=http://localhost:3000/ electron .",
     "electron-start": "node ./electron-wait-react",
-    "electron-pack-linux": "electron-builder -l -c.extraMetadata.main=build/electron.js",
-    "electron-pack-win": "electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "electron-pack-linux": "yarn build && electron-builder -l -c.extraMetadata.main=build/electron.js",
+    "electron-pack-win": "yarn build && electron-builder -w -c.extraMetadata.main=build/electron.js",
     "preelectron-pack": "yarn build"
   },
   "eslintConfig": {
