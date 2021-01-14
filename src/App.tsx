@@ -192,12 +192,24 @@ function App() {
 
   function handleToggleVisible() {
     console.log('handleToggleVisible');
+    setLabelState((state) => {
+      if (state.nextProps['is_visible'] !== undefined) {
+        state.nextProps['is_visible'].value = !state.nextProps['is_visible']
+          .value;
+      }
+    });
   }
   function handleModeChangeToI() {
     console.log('handleModeChangeToI');
+    setControlState((state) => {
+      state.toolMode = 'i';
+    });
   }
   function handleModeChangeToE() {
     console.log('handleModeChangeToE');
+    setControlState((state) => {
+      state.toolMode = 'e';
+    });
   }
   function handleSave() {
     console.log('handleSave');
@@ -310,8 +322,8 @@ function App() {
           <div className="ToolMode">
             <Radio.Group
               options={[
-                { label: 'Insert Mode (i)', value: 'i' },
-                { label: 'Edit Mode (e)', value: 'e' },
+                { label: 'Insert Mode (1)', value: 'i' },
+                { label: 'Edit Mode (2)', value: 'e' },
               ]}
               onChange={handleToolModeChange}
               value={toolMode}
@@ -362,7 +374,7 @@ function App() {
           <div className="ControlTips">
             press [space] to pan;{' '}
             {toolMode === 'i'
-              ? '[left click] to insert new keypoint; [right click] to pop out keypoint;'
+              ? '[left click] to insert new keypoint; [right click] to pop out keypoint; [v] to toggle is_visible'
               : '[left click] to select and drag keypoint;'}
           </div>
           {imagePath ? (
