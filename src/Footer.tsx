@@ -1,7 +1,12 @@
 import { ChangeEvent, useState, useEffect } from 'react';
 import isElectron from 'is-electron';
-import { Button, Input, Select, Switch } from 'antd';
-import { UpOutlined, DownOutlined, SaveOutlined } from '@ant-design/icons';
+import { Button, Input, Select, Switch, message, Spin } from 'antd';
+import {
+  UpOutlined,
+  DownOutlined,
+  SaveOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 import path from 'path';
 import {
   useSetupStore,
@@ -158,10 +163,11 @@ function ElectronWorkplaceControl() {
   );
   const [imgPathList, setImgPathList] = useState<string[]>([]);
   const [autoSave, setAutoSave] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
   useEffect(() => {
-    electron.ipcRenderer.once('select-workspace', handleWorkplaceSelected);
-    electron.ipcRenderer.once('save-labeling-result', handleResultSaved);
-    electron.ipcRenderer.once('load-labeling-result', handleResultLoaded);
+    electron.ipcRenderer.on('select-workspace', handleWorkplaceSelected);
+    electron.ipcRenderer.on('save-labeling-result', handleResultSaved);
+    electron.ipcRenderer.on('load-labeling-result', handleResultLoaded);
     // Specify how to clean up after this effect:
     return function cleanupListeners() {
       electron.ipcRenderer.removeAllListeners('select-workspace');
@@ -192,16 +198,23 @@ function ElectronWorkplaceControl() {
     }
   };
   const handleResultSaved = (event: any, info: any) => {
+    console.log('sav!!');
+    setSaving(false);
     const { labelingResultPath, success, error } = info;
-    const notification = {
-      title: 'Saved Successfully',
-      body: `Labeling result saved to ${labelingResultPath}`,
-    };
-    if (!success) {
-      notification.title = 'Save Error';
-      notification.body = error;
+    // const notification = {
+    //   title: 'Saved Successfully',
+    //   body: `Labeling result saved to ${labelingResultPath}`,
+    // };
+    // if (!success) {
+    //   notification.title = 'Save Error';
+    //   notification.body = error;
+    // }
+    // new window.Notification(notification.title, notification);
+    if (success) {
+      message.success(`Saved to ${labelingResultPath}`);
+    } else {
+      message.error(`Save Error: ${error.toString()}`);
     }
-    new window.Notification(notification.title, notification);
   };
   const handleOpenDirClick = () => {
     electron.ipcRenderer.send('select-workspace');
@@ -231,6 +244,9 @@ function ElectronWorkplaceControl() {
 
   const prepareLabels = (labelingResult: any) => {
     if (labelingResult['configVersion'] !== labelingConfig['configVersion']) {
+      message.warning(
+        `'configVersion' of the current _LABEL.json is incompatible with the loaded config file's 'configVersion'! Empty current labels.`
+      );
       console.log(
         `labelingResult['configVersion'] !== labelingConfig['configVersion']`
       );
@@ -283,11 +299,13 @@ function ElectronWorkplaceControl() {
       imageLoadError
     );
     const labelingResultPath = getLabelingResultPath(imagePath);
+    setSaving(true);
     electron.ipcRenderer.send('save-labeling-result', {
       labelingResultPath,
       labelingResult,
     });
   };
+  const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   return (
     <div className="FooterRow">
@@ -362,12 +380,10 @@ function ElectronWorkplaceControl() {
           style={{ width: 50 }}
           type="primary"
           size="small"
-          disabled={!imagePath}
+          disabled={!imagePath || saving}
+          onClick={saveLabelingResult}
         >
-          <SaveOutlined
-            style={{ cursor: 'pointer' }}
-            onClick={saveLabelingResult}
-          />
+          {saving ? <Spin indicator={loadingIcon} /> : <SaveOutlined />}
         </Button>
       </span>
     </div>
