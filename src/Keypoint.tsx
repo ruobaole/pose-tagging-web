@@ -25,13 +25,12 @@ export function Keypoint(props: IKeypointProps) {
   );
   const glowFilter = new GlowFilter({
     distance: 15,
-    innerStrength: 2,
-    outerStrength: 2,
+    // innerStrength: 2,
+    outerStrength: 4,
     color: 0xebebb8,
   });
   const draw = useCallback(
     (g: PIXI.Graphics) => {
-      // setThisGraph(g);
       const radius = props.radius === undefined ? 4 : props.radius;
       const color = props.color === undefined ? 0xff00ff : props.color;
       const alpha = props.alpha === undefined ? 1 : props.alpha;
@@ -39,15 +38,21 @@ export function Keypoint(props: IKeypointProps) {
       // outer circle
       g.lineStyle(1, color, alpha);
       g.drawCircle(0, 0, radius);
-      // select area
-      g.lineStyle(0);
-      g.beginFill(0xffff0b, 0);
-      g.drawCircle(0, 0, radius - 1.5);
-      g.endFill();
+      // // select area
+      // g.lineStyle(0);
+      // g.beginFill(0xffff0b, 0);
+      // g.drawCircle(0, 0, radius - 1.5);
+      // g.endFill();
+      // // center
+      // g.lineStyle(0);
+      // g.beginFill(0xffff0b, 0.7);
+      // g.drawCircle(0, 0, 1);
+      // g.endFill();
+
       // center
       g.lineStyle(0);
       g.beginFill(0xffff0b, 0.7);
-      g.drawCircle(0, 0, 1);
+      g.drawCircle(0, 0, radius - 2);
       g.endFill();
       if (props.highlight) {
         g.filters = [glowFilter];

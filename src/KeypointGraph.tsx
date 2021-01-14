@@ -68,6 +68,9 @@ export function KeypointGraph(props: IKeypointGraphProps) {
                       y1={kp.y}
                       x2={kpg[idxn].x}
                       y2={kpg[idxn].y}
+                      lineWidth={
+                        keypointRadius / 5 < 1 ? 1 : keypointRadius / 5
+                      }
                       color={+labelingConfig.keypointGraph[ikp].edgeColors[i]}
                       alpha={1}
                     />

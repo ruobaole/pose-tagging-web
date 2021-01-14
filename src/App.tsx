@@ -11,6 +11,7 @@ import { Viewport } from './Viewport';
 // import { ImageSprite } from './ImageSprite';
 import { KeypointGraph } from './KeypointGraph';
 import { InsertKPGTool } from './InsertKPGTool';
+import { DisplayOptionTool } from './DisplayOptionTool';
 import { Footer } from './Footer';
 import { LabelDataDisplay } from './LabelDataDisplay';
 import { ClickEventData } from 'pixi-viewport';
@@ -236,7 +237,7 @@ function App() {
           ? imageRef.current.naturalWidth
           : imageRef.current.naturalHeight;
       setSetupState((state) => {
-        state.keypointRadius = dim / 400.0;
+        state.keypointRadius = dim / 200.0;
       });
     }
   }
@@ -360,7 +361,9 @@ function App() {
               <InsertKPGTool
                 nextPointIdx={keypointGraphList[selectedKPG].length}
               />
-            ) : null}
+            ) : (
+              <DisplayOptionTool />
+            )}
           </div>
         </div>
         <div className="StageArea" ref={stageRef}>
