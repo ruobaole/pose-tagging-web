@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import create from 'zustand';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import produce from 'immer';
+import { HotKeys } from 'react-hotkeys';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
@@ -175,6 +176,32 @@ function App() {
       );
     }
   }, [stageRef, setStageSize]);
+
+  const keyMap = {
+    TOGGLE_VISIBLE: 'v',
+    MODE_I: '1',
+    MODE_E: '2',
+    SAVE: ['s'],
+  };
+  const hotKeyHandlers = {
+    TOGGLE_VISIBLE: handleToggleVisible,
+    MODE_I: handleModeChangeToI,
+    MODE_E: handleModeChangeToE,
+    SAVE: handleSave,
+  };
+
+  function handleToggleVisible() {
+    console.log('handleToggleVisible');
+  }
+  function handleModeChangeToI() {
+    console.log('handleModeChangeToI');
+  }
+  function handleModeChangeToE() {
+    console.log('handleModeChangeToE');
+  }
+  function handleSave() {
+    console.log('handleSave');
+  }
   function handleImageLoadError(e: React.SyntheticEvent) {
     console.log('eeeeee');
     setSetupState((state) => {
@@ -301,7 +328,8 @@ function App() {
           </div>
         </div>
         <div className="StageArea" ref={stageRef}>
-          <div className="Stage">
+          <HotKeys keyMap={keyMap} handlers={hotKeyHandlers} className="Stage">
+            {/* <div className="Stage"> */}
             <Stage
               width={stageSize[0]}
               height={stageSize[1]}
@@ -329,7 +357,8 @@ function App() {
                 })}
               </Viewport>
             </Stage>
-          </div>
+            {/* </div> */}
+          </HotKeys>
           <div className="ControlTips">
             press [space] to pan;{' '}
             {toolMode === 'i'

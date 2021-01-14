@@ -75,7 +75,7 @@ export function WebFooter() {
 
 function validateLabelingConfig(newConfig: any) {
   if (
-    !newConfig['example_pose1'] ||
+    !newConfig['configVersion'] ||
     !newConfig['keypointGraph'] ||
     newConfig['keypointGraph'].length < 1
   ) {
@@ -113,7 +113,7 @@ function ElectronConfigFileUpload() {
   );
   const { setLabelState } = useLabelStore(labelSelector);
   useEffect(() => {
-    electron.ipcRenderer.once('load-config', handleConfigLoaded);
+    electron.ipcRenderer.on('load-config', handleConfigLoaded);
     // Specify how to clean up after this effect:
     return function cleanupListeners() {
       electron.ipcRenderer.removeAllListeners('load-config');
