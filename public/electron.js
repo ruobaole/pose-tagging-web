@@ -37,7 +37,7 @@ function createWindow() {
     url.format({
       // pathname: path.join(__dirname, '/../build/index.html'),
       // protocol: 'file:',
-      pathname: path.join(__dirname, 'build/index.html'),
+      pathname: path.join(__dirname, '../build/index.html'),
       protocol: 'safe-file-protocol:',
       slashes: true,
     });

@@ -3,7 +3,10 @@
   "productName": "posetag",
   "homepage": "./",
   "description": "A simple tool for labeling pose keypoints",
-  "author": "daisy.pang",
+  "author": {
+    "name": "daisy.pang",
+    "email": "daisyrpanglive@live.com"
+  },
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -27,18 +30,27 @@
   },
   "build": {
     "appId": "com.electron.posetag",
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
     },
     "win": {
-      "target": "squirrel",
-      "icon": "build/icon.png"
+      "icon": "assets/icon.ico",
+      "target": [
+        "portable"
+      ]
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "target": [
+        "AppImage"
+      ]
     }
   },
-  "main": "./electron-starter.js",
+  "main": "public/electron.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "cross-env NODE_ENV=production react-scripts build",
@@ -49,7 +61,9 @@
     "electron": "electron .",
     "electron-dev": "cross-env ELECTRON_START_URL=http://localhost:3000/ electron .",
     "electron-start": "node ./electron-wait-react",
-    "pack-ubuntu": "electron-packager . posetag --overwrite --platform=linux --arch=x64 --icon=build/icon.png --prune=true --out=release-builds"
+    "electron-pack-ubuntu": "electron-builder -l -c.extraMetadata.main=build/electron.js",
+    "electron-pack-win": "electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "preelectron-pack": "yarn build"
   },
   "eslintConfig": {
     "extends": [
