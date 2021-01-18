@@ -4,6 +4,7 @@ const url = require('url');
 const path = require('path');
 const fs = require('fs').promises;
 const fg = require('fast-glob');
+const normalize = require('normalize-path');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -27,8 +28,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
-    width: 1400,
-    height: 900,
+    width: 1300,
+    height: 850,
   });
 
   // and load the index.html of the app.
@@ -111,10 +112,11 @@ ipcMain.on('select-workspace', async (event) => {
       title: 'Select workspace',
       properties: ['openDirectory'],
     });
+    const pat = normalize(
+      `${filePaths[0]}/*.{jpg,JPG,png,PNG,jpeg,JPEG,bmp,BMP}`
+    );
     if (!canceled && filePaths.length > 0) {
-      const imgList = await fg([
-        `${filePaths[0]}/*.{jpg,JPG,png,PNG,jpeg,JPEG,bmp,BMP}`,
-      ]);
+      const imgList = await fg([pat]);
       const imgURLs = imgList.map((imgp) => {
         return `${safeFileProtocol}://` + imgp;
       });
