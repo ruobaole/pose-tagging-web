@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import * as PIXI from 'pixi.js';
-import { GlowFilter } from 'pixi-filters';
+// import { GlowFilter } from 'pixi-filters';
 import { Graphics } from '@inlet/react-pixi';
 
 interface IKeypointProps {
@@ -23,12 +23,12 @@ export function Keypoint(props: IKeypointProps) {
   const [draggingData, setDraggingData] = useState<null | PIXI.InteractionData>(
     null
   );
-  const glowFilter = new GlowFilter({
-    distance: 15,
-    // innerStrength: 2,
-    outerStrength: 4,
-    color: 0xebebb8,
-  });
+  // const glowFilter = new GlowFilter({
+  //   distance: 15,
+  //   // innerStrength: 2,
+  //   outerStrength: 4,
+  //   color: 0xebebb8,
+  // });
   const draw = useCallback(
     (g: PIXI.Graphics) => {
       const radius = props.radius === undefined ? 4 : props.radius;
@@ -55,9 +55,11 @@ export function Keypoint(props: IKeypointProps) {
       g.drawCircle(0, 0, radius - 2);
       g.endFill();
       if (props.highlight) {
-        g.filters = [glowFilter];
+        // g.filters = [glowFilter];
+        g.scale.set(2, 2);
       } else {
-        g.filters = [];
+        // g.filters = [];
+        g.scale.set(1, 1);
       }
       g.position.set(props.x, props.y);
     },

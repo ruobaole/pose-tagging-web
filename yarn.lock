@@ -1506,6 +1506,102 @@
     "@pixi/core" "5.3.7"
     "@pixi/display" "5.3.7"
 
+"@pixi/canvas-display@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-display/download/@pixi/canvas-display-5.3.7.tgz#0949b2551a5f0b57c00bd18acc651815f2323f9a"
+  integrity sha1-CUmyVRpfC1fAC9GKzGUYFfIyP5o=
+  dependencies:
+    "@pixi/display" "5.3.7"
+
+"@pixi/canvas-extract@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-extract/download/@pixi/canvas-extract-5.3.7.tgz#dd1d5d9abfdc420656c34b8cd14ba18a7bb76ca8"
+  integrity sha1-3R1dmr/cQgZWw0uM0Uuhinu3bKg=
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.7"
+    "@pixi/core" "5.3.7"
+    "@pixi/display" "5.3.7"
+    "@pixi/math" "5.3.7"
+    "@pixi/utils" "5.3.7"
+
+"@pixi/canvas-graphics@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-graphics/download/@pixi/canvas-graphics-5.3.7.tgz#179998c60d9dbdb85b3af61e756aba662617e11e"
+  integrity sha1-F5mYxg2dvbhbOvYedWq6ZiYX4R4=
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.7"
+    "@pixi/constants" "5.3.7"
+    "@pixi/core" "5.3.7"
+    "@pixi/graphics" "5.3.7"
+    "@pixi/math" "5.3.7"
+
+"@pixi/canvas-mesh@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-mesh/download/@pixi/canvas-mesh-5.3.7.tgz#23ca37d97fb5ae59db718ba4e699808357270945"
+  integrity sha1-I8o32X+1rlnbcYuk5pmAg1cnCUU=
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.7"
+    "@pixi/constants" "5.3.7"
+    "@pixi/mesh" "5.3.7"
+    "@pixi/mesh-extras" "5.3.7"
+    "@pixi/settings" "5.3.7"
+
+"@pixi/canvas-particles@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-particles/download/@pixi/canvas-particles-5.3.7.tgz#9eb1a565e8cd67eccdaf970b5bf0e454b3a297f9"
+  integrity sha1-nrGlZejNZ+zNr5cLW/DkVLOil/k=
+  dependencies:
+    "@pixi/particles" "5.3.7"
+
+"@pixi/canvas-prepare@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-prepare/download/@pixi/canvas-prepare-5.3.7.tgz#2f365549d58f589988d8f70e08945f2f43a9a042"
+  integrity sha1-LzZVSdWPWJmI2PcOCJRfL0OpoEI=
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.7"
+    "@pixi/core" "5.3.7"
+    "@pixi/prepare" "5.3.7"
+
+"@pixi/canvas-renderer@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-renderer/download/@pixi/canvas-renderer-5.3.7.tgz#c314261d0bc39e972f1eadc4670a99ad886e7323"
+  integrity sha1-wxQmHQvDnpcvHq3EZwqZrYhucyM=
+  dependencies:
+    "@pixi/constants" "5.3.7"
+    "@pixi/core" "5.3.7"
+    "@pixi/math" "5.3.7"
+    "@pixi/settings" "5.3.7"
+    "@pixi/utils" "5.3.7"
+
+"@pixi/canvas-sprite-tiling@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-sprite-tiling/download/@pixi/canvas-sprite-tiling-5.3.7.tgz#755102506ca8acc021a6afadc590b59c1a338250"
+  integrity sha1-dVECUGyorMAhpq+txZC1nBozglA=
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.7"
+    "@pixi/canvas-sprite" "5.3.7"
+    "@pixi/sprite-tiling" "5.3.7"
+    "@pixi/utils" "5.3.7"
+
+"@pixi/canvas-sprite@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-sprite/download/@pixi/canvas-sprite-5.3.7.tgz#c7662dc147e601588ebe819d278ba746ffa2be9f"
+  integrity sha1-x2YtwUfmAViOvoGdJ4unRv+ivp8=
+  dependencies:
+    "@pixi/canvas-renderer" "5.3.7"
+    "@pixi/constants" "5.3.7"
+    "@pixi/math" "5.3.7"
+    "@pixi/sprite" "5.3.7"
+    "@pixi/utils" "5.3.7"
+
+"@pixi/canvas-text@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/@pixi/canvas-text/download/@pixi/canvas-text-5.3.7.tgz#2bc975e10b9c113a7e98aac360c9865ae24538d2"
+  integrity sha1-K8l14QucETp+mKrDYMmGWuJFONI=
+  dependencies:
+    "@pixi/sprite" "5.3.7"
+    "@pixi/text" "5.3.7"
+
 "@pixi/constants@5.3.7":
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/@pixi/constants/-/constants-5.3.7.tgz#a2e1789a98deb3713cfcb3eba3db84588bc9161e"
@@ -8693,15 +8789,10 @@ normalize-path@^2.1.1:
   dependencies:
     remove-trailing-separator "^1.0.1"
 
-normalize-path@^3.0.0:
+normalize-path@^3.0.0, normalize-path@~3.0.0:
   version "3.0.0"
   resolved "https://registry.npm.taobao.org/normalize-path/download/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha1-Dc1p/yOhybEf0JeDFmRKA4ghamU=
-
-normalize-path@~3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
-  integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
 normalize-range@^0.1.2:
   version "0.1.2"
@@ -9321,7 +9412,24 @@ pixi-viewport@^4.18.1:
   dependencies:
     penner "^0.1.3"
 
-pixi.js@^5.3.7:
+pixi.js-legacy@^5.3.7:
+  version "5.3.7"
+  resolved "https://registry.npm.taobao.org/pixi.js-legacy/download/pixi.js-legacy-5.3.7.tgz#894254e0ebddc9894c7da58bd08df259137fe0a0"
+  integrity sha1-iUJU4OvdyYlMfaWL0I3yWRN/4KA=
+  dependencies:
+    "@pixi/canvas-display" "5.3.7"
+    "@pixi/canvas-extract" "5.3.7"
+    "@pixi/canvas-graphics" "5.3.7"
+    "@pixi/canvas-mesh" "5.3.7"
+    "@pixi/canvas-particles" "5.3.7"
+    "@pixi/canvas-prepare" "5.3.7"
+    "@pixi/canvas-renderer" "5.3.7"
+    "@pixi/canvas-sprite" "5.3.7"
+    "@pixi/canvas-sprite-tiling" "5.3.7"
+    "@pixi/canvas-text" "5.3.7"
+    pixi.js "5.3.7"
+
+pixi.js@5.3.7, pixi.js@^5.3.7:
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-5.3.7.tgz#d295076cdb631a0578ee5976d9da195087b6a50e"
   integrity sha512-DyFTn6sHB6njtBd879OCx7UZpt8dpVtOSNuLAdVaWZ2GhAFsTY59n07Ol0f+zx07QtpCmSt1P3pXGHjt9sPzbw==

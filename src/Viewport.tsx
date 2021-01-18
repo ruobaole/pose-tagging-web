@@ -1,6 +1,7 @@
 import React from 'react';
 import * as PIXI from 'pixi.js';
-import { PixiComponent, useApp } from '@inlet/react-pixi';
+// import { PixiComponent, useApp } from '@inlet/react-pixi';
+import { PixiComponent, useApp } from '@inlet/react-pixi/legacy';
 import { ClickEventData, Viewport as PixiViewport } from 'pixi-viewport';
 
 export interface IViewportProps {

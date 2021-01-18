@@ -6,7 +6,8 @@ import produce from 'immer';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
-import { Stage, Sprite } from '@inlet/react-pixi';
+import { Stage, Sprite } from '@inlet/react-pixi/legacy';
+// import { Stage, Sprite } from '@inlet/react-pixi';
 import { Viewport } from './Viewport';
 // import { ImageSprite } from './ImageSprite';
 import { KeypointGraph } from './KeypointGraph';
@@ -379,7 +380,7 @@ function App() {
               onContextMenu={(e) => {
                 e.preventDefault();
               }}
-              options={{ backgroundColor: 0xfcf8ec }}
+              options={{ backgroundColor: 0xfcf8ec, forceCanvas: true }}
             >
               <Viewport
                 width={stageSize[0]}
