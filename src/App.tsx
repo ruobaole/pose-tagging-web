@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import create from 'zustand';
+import { persist } from 'zustand/middleware';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import produce from 'immer';
 // import { HotKeys } from 'react-hotkeys';
@@ -80,18 +81,26 @@ export type SetupState = {
   setStageSize: (w: number, h: number) => void;
   setSetupState: (fn: (state: SetupState) => void) => void;
 };
-export const useSetupStore = create<SetupState>((set) => ({
-  labelingConfig: exampleConfig,
-  // imagePath: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/coin.png',
-  // imagePath:
-  //   'https://github.com/ruobaole/pose-tagging-web/blob/master/src/example_data/simple002.jpeg',
-  // imagePath: 'https://via.placeholder.com/1080',
-  imageLoading: false,
-  stageSize: [256, 256],
-  keypointRadius: 4,
-  setSetupState: (fn) => set(produce(fn)),
-  setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
-}));
+
+export const useSetupStore = create<SetupState>(
+  persist<SetupState>(
+    (set) => ({
+      labelingConfig: exampleConfig,
+      // imagePath: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/coin.png',
+      // imagePath:
+      //   'https://github.com/ruobaole/pose-tagging-web/blob/master/src/example_data/simple002.jpeg',
+      // imagePath: 'https://via.placeholder.com/1080',
+      imageLoading: false,
+      stageSize: [256, 256],
+      keypointRadius: 4,
+      setSetupState: (fn) => set(produce(fn)),
+      setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
+    }),
+    {
+      name: 'setup-storage',
+    }
+  )
+);
 export const setupSelector = (state: SetupState) => ({
   labelingConfig: state.labelingConfig,
   labelingConfigError: state.labelingConfigError,
@@ -134,12 +143,19 @@ export type LabelState = {
   selectedKP?: number;
   set: (fn: (state: LabelState) => void) => void;
 };
-export const useLabelStore = create<LabelState>((set) => ({
-  keypointGraphList: [[]],
-  selectedKPG: 0,
-  nextProps: getKPDefaultProps(exampleConfig.keypointGraph, 0),
-  set: (fn) => set(produce(fn)),
-}));
+export const useLabelStore = create<LabelState>(
+  persist<LabelState>(
+    (set) => ({
+      keypointGraphList: [[]],
+      selectedKPG: 0,
+      nextProps: getKPDefaultProps(exampleConfig.keypointGraph, 0),
+      set: (fn) => set(produce(fn)),
+    }),
+    {
+      name: 'label-storage',
+    }
+  )
+);
 export const labelSelector = (state: LabelState) => ({
   keypointGraphList: state.keypointGraphList,
   nextProps: state.nextProps,
