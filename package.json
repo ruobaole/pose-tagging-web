@@ -99,6 +99,7 @@
     "pixi-viewport": "^4.18.1",
     "pixi.js": "^5.3.7",
     "pixi.js-legacy": "^5.3.7",
+    "react-resize-detector": "^6.0.1-rc.5",
     "simple-zustand-devtools": "^1.0.0"
   }
 }

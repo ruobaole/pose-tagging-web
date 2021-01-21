@@ -1,9 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import produce from 'immer';
-// import { HotKeys } from 'react-hotkeys';
+import ResizeObserver from 'react-resize-detector';
 import './App.css';
 import { Radio } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
@@ -76,9 +76,7 @@ export type SetupState = {
   imagePath?: string;
   imageLoading: boolean;
   imageLoadError?: string;
-  stageSize: [number, number]; // width, height
   keypointRadius: number;
-  setStageSize: (w: number, h: number) => void;
   setSetupState: (fn: (state: SetupState) => void) => void;
 };
 
@@ -91,10 +89,8 @@ export const useSetupStore = create<SetupState>(
       //   'https://github.com/ruobaole/pose-tagging-web/blob/master/src/example_data/simple002.jpeg',
       // imagePath: 'https://via.placeholder.com/1080',
       imageLoading: false,
-      stageSize: [256, 256],
       keypointRadius: 4,
       setSetupState: (fn) => set(produce(fn)),
-      setStageSize: (w, h) => set((state) => ({ stageSize: [w, h] })),
     }),
     {
       name: 'setup-storage',
@@ -105,11 +101,9 @@ export const setupSelector = (state: SetupState) => ({
   labelingConfig: state.labelingConfig,
   labelingConfigError: state.labelingConfigError,
   imagePath: state.imagePath,
-  stageSize: state.stageSize,
   imageLoading: state.imageLoading,
   imageLoadError: state.imageLoadError,
   keypointRadius: state.keypointRadius,
-  setStageSize: state.setStageSize,
   setSetupState: state.setSetupState,
 });
 
@@ -174,8 +168,6 @@ function App() {
     labelingConfigError,
     imagePath,
     imageLoadError,
-    stageSize,
-    setStageSize,
     setSetupState,
   } = useSetupStore(setupSelector);
   const {
@@ -187,11 +179,15 @@ function App() {
   const { panMode, toolMode, setControlState } = useControlStore(
     controlSelector
   );
+  const [stageSize, setStageSize] = useState<Array<number>>([200, 200]);
   const stageRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
     if (stageRef && stageRef.current) {
-      setStageSize(stageRef.current.offsetWidth, stageRef.current.offsetHeight);
+      setStageSize([
+        stageRef.current.offsetWidth,
+        stageRef.current.offsetHeight,
+      ]);
       console.log(
         `${stageRef.current.offsetWidth} * ${stageRef.current.offsetHeight}`
       );
@@ -392,70 +388,81 @@ function App() {
             )}
           </div>
         </div>
-        <div className="StageArea" ref={stageRef}>
-          {/* <HotKeys keyMap={keyMap} handlers={hotKeyHandlers} className="Stage"> */}
-          <div className="Stage">
-            <Stage
-              width={stageSize[0]}
-              height={stageSize[1]}
-              tabIndex={0}
-              style={{ cursor: panMode ? 'move' : 'default' }}
-              onKeyPress={handleKeyPress}
-              onKeyUp={handleKeyUp}
-              onContextMenu={(e) => {
-                e.preventDefault();
-              }}
-              options={{ backgroundColor: 0xfcf8ec, forceCanvas: true }}
-            >
-              <Viewport
+        <ResizeObserver
+          skipOnMount={true}
+          refreshMode={'debounce'}
+          refreshRate={1000}
+          onResize={(w, h) => {
+            console.log(`w: ${w} - h: ${h}`);
+          }}
+        >
+          <div className="StageArea" ref={stageRef}>
+            {/* <HotKeys keyMap={keyMap} handlers={hotKeyHandlers} className="Stage"> */}
+            <div className="Stage">
+              <Stage
                 width={stageSize[0]}
                 height={stageSize[1]}
-                enablePan={panMode}
-                onClicked={handleViewportClicked}
+                tabIndex={0}
+                style={{ cursor: panMode ? 'move' : 'default' }}
+                onKeyPress={handleKeyPress}
+                onKeyUp={handleKeyUp}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                }}
+                options={{ backgroundColor: 0xfcf8ec, forceCanvas: true }}
               >
-                {/* <ImageSprite /> */}
-                {imagePath && imageRef.current ? (
-                  <Sprite image={imagePath} x={0} y={0} />
-                ) : null}
-                {keypointGraphList.map((_, gidx) => {
-                  return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
-                })}
-              </Viewport>
-            </Stage>
+                <Viewport
+                  width={stageSize[0]}
+                  height={stageSize[1]}
+                  enablePan={panMode}
+                  onClicked={handleViewportClicked}
+                >
+                  {/* <ImageSprite /> */}
+                  {imagePath && imageRef.current ? (
+                    <Sprite image={imagePath} x={0} y={0} />
+                  ) : null}
+                  {keypointGraphList.map((_, gidx) => {
+                    return (
+                      <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />
+                    );
+                  })}
+                </Viewport>
+              </Stage>
+            </div>
+            {/* </HotKeys> */}
+            <div className="ControlTips">
+              press [space] to pan;{' '}
+              {toolMode === 'i'
+                ? '[left click] to insert new keypoint; [right click] to pop out keypoint; [v] to toggle is_visible'
+                : '[left click] to select and drag keypoint;'}
+            </div>
+            {imagePath ? (
+              <img
+                ref={imageRef}
+                hidden={true}
+                src={imagePath ? imagePath : ''}
+                alt="labeling rawdata"
+                crossOrigin=""
+                onError={handleImageLoadError}
+                onLoad={handleImageLoad}
+              />
+            ) : null}
+            <div className="ErrorNote" hidden={!imageLoadError}>
+              Image Load Error
+            </div>
+            <div className="LabelData" onWheel={handleLabelAreaWheel}>
+              <LabelDataDisplay
+                downloadContent={getLabelingResult(
+                  labelingConfig,
+                  keypointGraphList,
+                  labelingConfigError,
+                  imagePath,
+                  imageLoadError
+                )}
+              />
+            </div>
           </div>
-          {/* </HotKeys> */}
-          <div className="ControlTips">
-            press [space] to pan;{' '}
-            {toolMode === 'i'
-              ? '[left click] to insert new keypoint; [right click] to pop out keypoint; [v] to toggle is_visible'
-              : '[left click] to select and drag keypoint;'}
-          </div>
-          {imagePath ? (
-            <img
-              ref={imageRef}
-              hidden={true}
-              src={imagePath ? imagePath : ''}
-              alt="labeling rawdata"
-              crossOrigin=""
-              onError={handleImageLoadError}
-              onLoad={handleImageLoad}
-            />
-          ) : null}
-          <div className="ErrorNote" hidden={!imageLoadError}>
-            Image Load Error
-          </div>
-          <div className="LabelData" onWheel={handleLabelAreaWheel}>
-            <LabelDataDisplay
-              downloadContent={getLabelingResult(
-                labelingConfig,
-                keypointGraphList,
-                labelingConfigError,
-                imagePath,
-                imageLoadError
-              )}
-            />
-          </div>
-        </div>
+        </ResizeObserver>
       </main>
       <footer className="App-footer">
         <Footer />
