@@ -257,6 +257,15 @@ function App() {
     if (e.key === '2') {
       handleModeChangeToE();
     }
+    if (e.key === 'a') {
+      console.log('aaa');
+    }
+    if (e.key === 'd') {
+      console.log('ddd');
+    }
+    if (e.key === 's' && !e.repeat) {
+      console.log('sss');
+    }
   }
   function handleKeyUp(e: React.KeyboardEvent<any>) {
     if (e.key === ' ' && !e.repeat) {
