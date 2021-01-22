@@ -60,7 +60,7 @@
 }
 
 .StageArea {
-  flex: 1;
+  flex: 1 1 auto;
   position: relative;
   z-index: 1;
   /* display: flex;

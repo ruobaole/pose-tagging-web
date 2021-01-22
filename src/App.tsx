@@ -228,11 +228,8 @@ function App() {
       state.toolMode = 'e';
     });
   }
-  function handleSave() {
-    console.log('handleSave');
-  }
   function handleImageLoadError(e: React.SyntheticEvent) {
-    console.log('eeeeee');
+    console.log('Image Load Error');
     setSetupState((state) => {
       state.imageLoadError = e.toString();
     });
@@ -343,6 +340,20 @@ function App() {
       }
     }
   }
+  function handleWindowResize(w: number, h: number) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`resize: ${w} - ${h}`);
+    }
+    if (
+      stageRef.current?.offsetWidth !== undefined &&
+      stageRef.current?.offsetHeight !== undefined
+    ) {
+      setStageSize([
+        stageRef.current?.offsetWidth,
+        stageRef.current?.offsetHeight,
+      ]);
+    }
+  }
   // console.log(`PAN: ${panMode}`);
   // console.log(JSON.stringify(keypointGraphList));
   // console.log(
@@ -362,74 +373,66 @@ function App() {
     console.log(`selectedKPG: ${selectedKPG}`);
   }
   return (
-    <div className="App">
-      {/* <header className="App-header"></header> */}
-      <main className="App-main">
-        <div className="Tools">
-          <div className="ToolMode">
-            <Radio.Group
-              options={[
-                { label: 'Insert Mode (1)', value: 'i' },
-                { label: 'Edit Mode (2)', value: 'e' },
-              ]}
-              onChange={handleToolModeChange}
-              value={toolMode}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </div>
-          <div className="ToolDetail">
-            {toolMode === 'i' ? (
-              <InsertKPGTool
-                nextPointIdx={keypointGraphList[selectedKPG].length}
+    <ResizeObserver
+      skipOnMount={true}
+      refreshMode={'debounce'}
+      refreshRate={500}
+      onResize={handleWindowResize}
+    >
+      <div className="App">
+        {/* <header className="App-header"></header> */}
+        <main className="App-main">
+          <div className="Tools">
+            <div className="ToolMode">
+              <Radio.Group
+                options={[
+                  { label: 'Insert Mode (1)', value: 'i' },
+                  { label: 'Edit Mode (2)', value: 'e' },
+                ]}
+                onChange={handleToolModeChange}
+                value={toolMode}
+                optionType="button"
+                buttonStyle="solid"
               />
-            ) : (
-              <DisplayOptionTool />
-            )}
+            </div>
+            <div className="ToolDetail">
+              {toolMode === 'i' ? (
+                <InsertKPGTool
+                  nextPointIdx={keypointGraphList[selectedKPG].length}
+                />
+              ) : (
+                <DisplayOptionTool />
+              )}
+            </div>
           </div>
-        </div>
-        <ResizeObserver
-          skipOnMount={true}
-          refreshMode={'debounce'}
-          refreshRate={1000}
-          onResize={(w, h) => {
-            console.log(`w: ${w} - h: ${h}`);
-          }}
-        >
           <div className="StageArea" ref={stageRef}>
-            {/* <HotKeys keyMap={keyMap} handlers={hotKeyHandlers} className="Stage"> */}
-            <div className="Stage">
-              <Stage
+            <Stage
+              width={stageSize[0]}
+              height={stageSize[1]}
+              tabIndex={0}
+              style={{ cursor: panMode ? 'move' : 'default' }}
+              onKeyPress={handleKeyPress}
+              onKeyUp={handleKeyUp}
+              onContextMenu={(e) => {
+                e.preventDefault();
+              }}
+              options={{ backgroundColor: 0xfcf8ec, forceCanvas: true }}
+            >
+              <Viewport
                 width={stageSize[0]}
                 height={stageSize[1]}
-                tabIndex={0}
-                style={{ cursor: panMode ? 'move' : 'default' }}
-                onKeyPress={handleKeyPress}
-                onKeyUp={handleKeyUp}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                }}
-                options={{ backgroundColor: 0xfcf8ec, forceCanvas: true }}
+                enablePan={panMode}
+                onClicked={handleViewportClicked}
               >
-                <Viewport
-                  width={stageSize[0]}
-                  height={stageSize[1]}
-                  enablePan={panMode}
-                  onClicked={handleViewportClicked}
-                >
-                  {/* <ImageSprite /> */}
-                  {imagePath && imageRef.current ? (
-                    <Sprite image={imagePath} x={0} y={0} />
-                  ) : null}
-                  {keypointGraphList.map((_, gidx) => {
-                    return (
-                      <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />
-                    );
-                  })}
-                </Viewport>
-              </Stage>
-            </div>
-            {/* </HotKeys> */}
+                {/* <ImageSprite /> */}
+                {imagePath && imageRef.current ? (
+                  <Sprite image={imagePath} x={0} y={0} />
+                ) : null}
+                {keypointGraphList.map((_, gidx) => {
+                  return <KeypointGraph key={`kpg-${gidx}`} graphIdx={gidx} />;
+                })}
+              </Viewport>
+            </Stage>
             <div className="ControlTips">
               press [space] to pan;{' '}
               {toolMode === 'i'
@@ -462,12 +465,12 @@ function App() {
               />
             </div>
           </div>
-        </ResizeObserver>
-      </main>
-      <footer className="App-footer">
-        <Footer />
-      </footer>
-    </div>
+        </main>
+        <footer className="App-footer">
+          <Footer />
+        </footer>
+      </div>
+    </ResizeObserver>
   );
 }
 
